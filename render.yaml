@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: trafo-datasheet
+    runtime: docker
+    plan: starter
+    envVars:
+      - key: APP_PASSWORD
+        sync: false        # set in the Render dashboard
+    healthCheckPath: /

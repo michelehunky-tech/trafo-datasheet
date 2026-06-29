@@ -1,0 +1,106 @@
+@font-face{font-family:"Zalando Sans";font-weight:300;src:url("../assets/fonts/zalando-sans-latin-300-normal.ttf");}
+@font-face{font-family:"Zalando Sans";font-weight:400;src:url("../assets/fonts/zalando-sans-latin-400-normal.ttf");}
+@font-face{font-family:"Zalando Sans";font-weight:500;src:url("../assets/fonts/zalando-sans-latin-500-normal.ttf");}
+@font-face{font-family:"Zalando Sans";font-weight:600;src:url("../assets/fonts/zalando-sans-latin-600-normal.ttf");}
+@font-face{font-family:"Zalando Sans";font-weight:700;src:url("../assets/fonts/zalando-sans-latin-700-normal.ttf");}
+@font-face{font-family:"Zalando Sans SemiExpanded";font-weight:400;src:url("../assets/fonts/zalando-sans-semiexpanded-latin-400-normal.ttf");}
+@font-face{font-family:"Zalando Sans SemiExpanded";font-weight:600;src:url("../assets/fonts/zalando-sans-semiexpanded-latin-600-normal.ttf");}
+
+:root{
+  --ink:#1D1E1B; --ink-soft:#5E605C; --line:#D4D6D9; --rule:#1D1E1B;
+  --panel:#ECEDEF; --accent:#FFD000; --white:#fff;
+}
+
+@page{
+  size:A4 portrait; margin:22mm 15mm 16mm 15mm;
+  @top-left{ content:element(pageHeader); width:100%; }
+  @bottom-left{ content:element(pageFooter); width:100%; }
+}
+
+*{box-sizing:border-box;}
+html{font-family:"Zalando Sans",Arial,sans-serif; color:var(--ink); font-size:9pt; line-height:1.45;}
+body{margin:0;}
+
+/* ---------- running header ---------- */
+#pageHeader{position:running(pageHeader); width:100%;}
+.hdr{width:100%; border-collapse:collapse;}
+.hdr td{vertical-align:middle; padding:0;}
+.hdr .logo img{height:30px;}
+.hdr .tag{text-align:right; font-size:7pt; letter-spacing:.2em; text-transform:lowercase; color:var(--ink-soft);}
+.hdr-rule{height:3px; margin-top:6px;
+  background:linear-gradient(112deg, var(--accent) 0 38px, var(--ink) 38px 41px, var(--line) 41px 100%);}
+
+/* ---------- running footer ---------- */
+#pageFooter{position:running(pageFooter); width:100%;}
+.ftr{width:100%; border-collapse:collapse; border-top:.5pt solid var(--line); padding-top:5px;}
+.ftr td{font-size:7pt; color:var(--ink-soft); padding-top:5px;}
+.ftr .pg{text-align:right;}
+.ftr .pg::after{content:"Page " counter(page) " / " counter(pages);}
+
+/* ---------- title block ---------- */
+.titlewrap{position:relative; padding:6px 0 14px;}
+.titlewrap::after{content:""; position:absolute; top:-4px; right:0; width:46%; height:78px; z-index:-1;
+  background:linear-gradient(112deg, var(--white) 0 26%, var(--panel) 26% 100%);}
+.doctitle{font-family:"Zalando Sans SemiExpanded"; font-weight:400; font-size:30pt; line-height:1; letter-spacing:-.01em; margin:0;}
+.designation{font-family:"Zalando Sans SemiExpanded"; font-weight:600; font-size:15pt; margin:8px 0 0;}
+.designation .acc{color:var(--ink); border-left:3px solid var(--accent); padding-left:8px;}
+
+/* ---------- meta row ---------- */
+.meta{width:100%; border-collapse:collapse; margin:14px 0 4px;}
+.meta td{border-top:.5pt solid var(--line); padding:7px 10px 7px 0; vertical-align:top; width:16.6%;}
+.meta .lbl{font-weight:600; font-size:7pt; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft); display:block; margin-bottom:3px;}
+.meta .val{font-weight:500; font-size:11pt;}
+
+/* ---------- section ---------- */
+.section{margin-top:24px; page-break-inside:avoid;}
+.eyebrow{display:flex; align-items:center; gap:8px; margin-bottom:7px;}
+.eyebrow .tick{width:15px; height:3px; background:var(--accent); display:inline-block; transform:skewX(-24deg);}
+.eyebrow h2{font-family:"Zalando Sans"; font-weight:700; font-size:8.5pt; letter-spacing:.14em; text-transform:uppercase; margin:0;}
+.eyebrow .ln{flex:1; height:1pt; background:var(--rule);}
+
+/* ---------- data tables ---------- */
+table.data{width:100%; border-collapse:collapse;}
+table.data td{padding:4.5px 8px; border-bottom:.5pt solid var(--line); font-size:9pt; vertical-align:top;}
+table.data td.k{width:58%; color:var(--ink);}
+table.data td.v{font-weight:500;}
+.u{color:var(--ink-soft); font-weight:400; font-size:8pt;}
+
+/* two columns side by side */
+.cols{width:100%; border-collapse:collapse; margin-top:24px; table-layout:fixed;}
+.cols>tbody>tr>td{vertical-align:top; padding:0;}
+.cols td.c{width:calc(50% - 14px);}
+.cols .gap{width:28px;}
+.cols td.c .section:first-child,.cols td.c .figwrap:first-child{margin-top:0;}
+
+/* HV/LV ratings */
+table.hvlv{width:100%; border-collapse:collapse;}
+table.hvlv th{font-weight:600; font-size:7pt; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft);
+  text-align:left; padding:4px 8px; background:var(--panel);}
+table.hvlv td{padding:4.5px 8px; border-bottom:.5pt solid var(--line); font-size:9pt;}
+table.hvlv td.k{width:42%;}
+table.hvlv td.val{font-weight:500;}
+.tapbar{margin-top:8px; border-collapse:collapse; width:100%;}
+.tapbar td{padding:4.5px 8px; border-bottom:.5pt solid var(--line); font-size:9pt;}
+.tapbar td.k{width:42%;}
+.tapbar td.val{font-weight:500;}
+
+/* ---------- figure ---------- */
+.figwrap{margin-top:24px; page-break-inside:avoid;}
+.figure{background:var(--white); padding:2px 2px 2px 0;}
+.figure .figsvg{display:block; width:100%; height:auto;}
+
+/* ---------- notes ---------- */
+.notes p{margin:0; font-size:9pt;}
+
+/* fallback image + caption (when an image has no axonometric calibration) */
+.figure .figimg{display:block; width:100%; height:auto;}
+.dimcap{margin-top:8px; font-weight:500; font-size:8.5pt;}
+.dimcap .lbl{font-weight:600; font-size:7pt; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft); margin-right:8px;}
+
+/* accessories table (two columns, manually entered in the form) */
+table.acc{width:100%; border-collapse:collapse;}
+table.acc th{font-weight:600; font-size:7pt; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft);
+  text-align:left; padding:4px 8px; background:var(--panel);}
+table.acc td{padding:4.5px 8px; border-bottom:.5pt solid var(--line); font-size:9pt; vertical-align:top;}
+table.acc td.k{width:50%;}
+table.acc td.v{font-weight:500;}

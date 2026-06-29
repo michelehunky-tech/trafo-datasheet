@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="render/styles.css">
+</head><body>
+
+{% macro section(sec) %}
+{% if sec %}
+<div class="section">
+  <div class="eyebrow"><span class="tick"></span><h2>{{ sec.title }}</h2><span class="ln"></span></div>
+  <table class="data">
+    {% for r in sec.rows %}
+    <tr><td class="k">{{ r.en }}</td>
+        <td class="v">{{ r.value }}{% if r.unit %} <span class="u">{{ r.unit }}</span>{% endif %}</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endif %}
+{% endmacro %}
+
+<div id="pageHeader">
+  <table class="hdr"><tr>
+    <td class="logo"><img src="assets/logo.svg"></td>
+    <td class="tag">endless transformation</td>
+  </tr></table>
+  <div class="hdr-rule"></div>
+</div>
+
+<div id="pageFooter">
+  <table class="ftr"><tr>
+    <td>TRAFO ELETTRO SRL &nbsp;·&nbsp; Via Ponte Poscola &nbsp;·&nbsp; 36075 Montecchio Maggiore (VI) &nbsp;·&nbsp; trafoelettro.com</td>
+    <td class="pg"></td>
+  </tr></table>
+</div>
+
+<div class="titlewrap">
+  <h1 class="doctitle">Technical Datasheet</h1>
+  <div class="designation"><span class="acc">{{ designation }}</span></div>
+</div>
+
+<table class="meta"><tr>
+  <td><span class="lbl">Client</span><span class="val">{{ meta.client or '—' }}</span></td>
+  <td><span class="lbl">Project</span><span class="val">{{ meta.project or '—' }}</span></td>
+  <td><span class="lbl">Date</span><span class="val">{{ meta.date or '—' }}</span></td>
+  <td><span class="lbl">Product code</span><span class="val">{{ meta.product_code or '—' }}</span></td>
+  <td><span class="lbl">Offer #</span><span class="val">{{ meta.offer or '—' }}</span></td>
+  <td><span class="lbl">Pos.</span><span class="val">{{ meta.pos or '—' }}</span></td>
+</tr></table>
+
+<table class="cols"><tr>
+  <td class="c">{{ section(sections.get('general')) }}</td>
+  <td class="gap"></td>
+  <td class="c">{{ section(sections.get('electrical')) }}</td>
+</tr></table>
+
+{% if ratings and ratings.pairs %}
+<div class="section">
+  <div class="eyebrow"><span class="tick"></span><h2>Ratings</h2><span class="ln"></span></div>
+  <table class="hvlv">
+    <tr><th>Parameter</th><th>HV (MV)</th><th>LV</th></tr>
+    {% for p in ratings.pairs %}
+    <tr><td class="k">{{ p.label }}</td>
+        <td class="val">{{ p.hv }}{% if p.unit %} <span class="u">{{ p.unit }}</span>{% endif %}</td>
+        <td class="val">{{ p.lv }}{% if p.unit %} <span class="u">{{ p.unit }}</span>{% endif %}</td></tr>
+    {% endfor %}
+  </table>
+  {% if ratings.taps %}
+  <table class="tapbar">
+    {% for t in ratings.taps %}
+    <tr><td class="k">{{ t.label }}</td><td class="val">{{ t.value }}</td></tr>
+    {% endfor %}
+  </table>
+  {% endif %}
+</div>
+{% endif %}
+
+<table class="cols"><tr>
+  <td class="c">
+    {{ section(sections.get('dimensions')) }}
+    {{ section(sections.get('environmental')) }}
+  </td>
+  <td class="gap"></td>
+  <td class="c">
+    {% if figure_svg %}
+    <div class="figwrap">
+      <div class="figure">{{ figure_svg|safe }}</div>
+    </div>
+    {% endif %}
+  </td>
+</tr></table>
+
+{% if accessories %}
+<div class="section">
+  <div class="eyebrow"><span class="tick"></span><h2>Accessories</h2><span class="ln"></span></div>
+  <table class="acc">
+    <tr><th>Accessory</th><th>Characteristic</th></tr>
+    {% for a in accessories %}
+    <tr><td class="k">{{ a.name }}</td><td class="v">{{ a.spec or '' }}</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endif %}
+
+{% if notes %}
+<div class="section notes">
+  <div class="eyebrow"><span class="tick"></span><h2>Notes</h2><span class="ln"></span></div>
+  <p>{{ notes }}</p>
+</div>
+{% endif %}
+
+</body></html>
