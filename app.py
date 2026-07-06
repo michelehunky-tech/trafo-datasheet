@@ -12,7 +12,7 @@ import streamlit as st
 
 from parser.extract import load_schema, parse
 from parser.validate import validate
-from render.pdf import render_pdf
+from render.pdf import render_pdf_modern
 
 OMIT = "__OMIT__"
 st.set_page_config(page_title="Trafo Elettro · Datasheet", layout="centered")
@@ -146,7 +146,7 @@ def main():
         acc.append({"name": "", "spec": ""}); st.rerun()
     accessories = [a for a in acc if (a.get("name") or "").strip()]
 
-    # tests & certifications (solo layout Moderno)
+    # tests & certifications
     st.subheader("Tests & Certifications")
     certs = st.session_state.setdefault("certs", [])
     if certs:
@@ -163,20 +163,9 @@ def main():
     certifications = [c for c in certs if (c.get("name") or "").strip()]
 
     notes = st.text_area("Notes (facoltative)", st.session_state.get("notes", ""))
-    layout = st.radio("Layout scheda",
-                      ["Classico (Zalando Sans)",
-                       "Moderno (Space Grotesk, disegno centrato)",
-                       "Industriale (IBM Plex, stile cartiglio tecnico)"],
-                      horizontal=False)
     if st.button("Genera PDF", type="primary"):
-        from render.pdf import render_pdf_modern, render_pdf_industrial
         out = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
-        if layout.startswith("Moderno"):
-            render_pdf_modern(parsed, meta, notes, out.name, accessories=accessories, certifications=certifications)
-        elif layout.startswith("Industriale"):
-            render_pdf_industrial(parsed, meta, notes, out.name, accessories=accessories)
-        else:
-            render_pdf(parsed, meta, notes, out.name, accessories=accessories)
+        render_pdf_modern(parsed, meta, notes, out.name, accessories=accessories, certifications=certifications)
         with open(out.name, "rb") as f:
             st.download_button("Scarica la scheda tecnica (PDF)", f.read(),
                                file_name=f"datasheet_{(meta['client'] or 'trafo').replace(' ', '_')}.pdf",
