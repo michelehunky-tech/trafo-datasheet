@@ -19,7 +19,7 @@ SECTION_TITLE = {
     "general": "General",
     "electrical": "Electrical",
     "ratings": "Ratings",
-    "environmental": "Working Condition",
+    "environmental": "Working Conditions",
     "dimensions": "Dimensions & weight",
 }
 
@@ -115,10 +115,12 @@ def build_fields(raw, family, schema):
 def grouped_sections(fields):
     """Group included, non-blank fields into ordered sections for the template."""
     groups = []
+    n = 0
     for sec in SECTION_ORDER:
         rows = [f for f in fields if f["section"] == sec and not f["blank"] and f["value"] not in (None, "")]
         if rows:
-            groups.append({"key": sec, "title": SECTION_TITLE[sec], "rows": rows})
+            n += 1
+            groups.append({"key": sec, "title": SECTION_TITLE[sec], "rows": rows, "idx": n})
     return groups
 
 
@@ -184,6 +186,23 @@ def designation(raw, schema):
     if tail:
         return f"{serie} — " + " · ".join(tail) if serie else " · ".join(tail)
     return serie
+
+
+def designation_parts(raw, schema):
+    """Three separate strings for the modern layout title:
+    main = power (big headline),  voltage = HV/LV voltage string,  series = serie code."""
+    nf = schema["meta"]["number_format"]
+    serie = str(raw.get("Serie") or "").strip()
+    power = raw.get("Potenza nominale")
+    main = f"{format_value(power, {'decimals':0}, nf)} kVA" if not is_blank(power) else (serie or "Transformer")
+    hv, lv = raw.get("Tensione MT1"), raw.get("Tensione BT")
+    if not is_blank(hv) and not is_blank(lv):
+        voltage = f"{format_value(hv, {'decimals':0}, nf)} / {format_value(lv, {'decimals':0}, nf)} V"
+    elif not is_blank(hv):
+        voltage = f"{format_value(hv, {'decimals':0}, nf)} V"
+    else:
+        voltage = ""
+    return main, voltage, serie
 
 
 def parse(xlsx_path, schema=None, overrides=None):

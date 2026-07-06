@@ -130,7 +130,7 @@ def main():
             for r in s["rows"]:
                 st.write(f"- {r['en']}: **{r['value']}**" + (f" {r['unit']}" if r["unit"] else ""))
 
-    # accessories: add one row at a time (accessory | characteristic)
+    # accessories
     st.subheader("Accessories")
     acc = st.session_state.setdefault("acc", [])
     if acc:
@@ -146,10 +146,37 @@ def main():
         acc.append({"name": "", "spec": ""}); st.rerun()
     accessories = [a for a in acc if (a.get("name") or "").strip()]
 
+    # tests & certifications (solo layout Moderno)
+    st.subheader("Tests & Certifications")
+    certs = st.session_state.setdefault("certs", [])
+    if certs:
+        h1, h2, _ = st.columns([3, 3, 1])
+        h1.caption("Test / Certification"); h2.caption("Detail")
+    for i, row in enumerate(certs):
+        c1, c2, c3 = st.columns([3, 3, 1])
+        row["name"] = c1.text_input("Test", row.get("name", ""), key=f"cert_n_{i}", label_visibility="collapsed")
+        row["spec"] = c2.text_input("Detail", row.get("spec", ""), key=f"cert_s_{i}", label_visibility="collapsed")
+        if c3.button("✕", key=f"cert_d_{i}"):
+            certs.pop(i); st.rerun()
+    if st.button("+ Aggiungi test / certificazione"):
+        certs.append({"name": "", "spec": ""}); st.rerun()
+    certifications = [c for c in certs if (c.get("name") or "").strip()]
+
     notes = st.text_area("Notes (facoltative)", st.session_state.get("notes", ""))
+    layout = st.radio("Layout scheda",
+                      ["Classico (Zalando Sans)",
+                       "Moderno (Space Grotesk, disegno centrato)",
+                       "Industriale (IBM Plex, stile cartiglio tecnico)"],
+                      horizontal=False)
     if st.button("Genera PDF", type="primary"):
+        from render.pdf import render_pdf_modern, render_pdf_industrial
         out = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
-        render_pdf(parsed, meta, notes, out.name, accessories=accessories)
+        if layout.startswith("Moderno"):
+            render_pdf_modern(parsed, meta, notes, out.name, accessories=accessories, certifications=certifications)
+        elif layout.startswith("Industriale"):
+            render_pdf_industrial(parsed, meta, notes, out.name, accessories=accessories)
+        else:
+            render_pdf(parsed, meta, notes, out.name, accessories=accessories)
         with open(out.name, "rb") as f:
             st.download_button("Scarica la scheda tecnica (PDF)", f.read(),
                                file_name=f"datasheet_{(meta['client'] or 'trafo').replace(' ', '_')}.pdf",

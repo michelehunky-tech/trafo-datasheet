@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="render/styles_modern.css">
+</head><body>
+
+{% set ns = namespace(n=0) %}
+{% macro grid(sec) %}
+{% if sec %}
+{% set ns.n = ns.n + 1 %}
+<div class="section">
+  <div class="sechead"><span class="num">{{ ns.n }}</span><h2>{{ sec.title }}</h2><span class="ln"></span></div>
+  <table class="grid3"><tr>
+  {% for r in sec.rows %}
+    <td style="width:33.33%">
+      <div class="cell">
+        <span class="k">{{ r.en }}</span>
+        <span class="v">{{ r.value }}{% if r.unit %} <span class="u">{{ r.unit }}</span>{% endif %}</span>
+      </div>
+    </td>
+    {% if loop.index % 3 == 0 and not loop.last %}</tr><tr>{% endif %}
+  {% endfor %}
+  </tr></table>
+</div>
+{% endif %}
+{% endmacro %}
+
+<div id="pageHeader">
+  <table class="hdr"><tr>
+    <td class="logo"><img src="assets/logo.png"></td>
+    <td class="tag">Technical Datasheet</td>
+  </tr></table>
+</div>
+
+<div id="pageFooter">
+  <table class="ftr"><tr>
+    <td>TRAFO ELETTRO SRL &nbsp;·&nbsp; Via Ponte Poscola &nbsp;·&nbsp; 36075 Montecchio Maggiore (VI) &nbsp;·&nbsp; trafoelettro.com</td>
+    <td class="pg"></td>
+  </tr></table>
+</div>
+
+<div class="hero">
+  <h1>{{ designation_main }}</h1>
+  <p class="sub">{{ designation_voltage }}{% if designation_series %} &nbsp;—&nbsp; {{ designation_series }}{% endif %}</p>
+  {% if meta.offer %}<span class="badge">Offer {{ meta.offer }}</span>{% endif %}
+</div>
+
+<table class="metastrip"><tr>
+  <td style="width:28%"><span class="lbl">Client</span><span class="val">{{ meta.client or '—' }}</span></td>
+  <td style="width:28%"><span class="lbl">Project</span><span class="val">{{ meta.project or '—' }}</span></td>
+  <td style="width:22%"><span class="lbl">Date</span><span class="val">{{ meta.date or '—' }}</span></td>
+  <td style="width:22%"><span class="lbl">Pos.</span><span class="val">{{ meta.pos or '—' }}</span></td>
+</tr></table>
+
+{% if figure_svg %}
+<div class="herofig">
+  <div class="frame">{{ figure_svg|safe }}</div>
+</div>
+{% endif %}
+
+{{ grid(sections.get('general')) }}
+{{ grid(sections.get('electrical')) }}
+
+{% if ratings and ratings.pairs %}
+{% set ns.n = ns.n + 1 %}
+<div class="section">
+  <div class="sechead"><span class="num">{{ ns.n }}</span><h2>Ratings</h2><span class="ln"></span></div>
+  <table class="hvlv2">
+    <tr><th>Parameter</th><th>HV (MV)</th><th>LV</th></tr>
+    {% for p in ratings.pairs %}
+    <tr><td class="k">{{ p.label }}</td>
+        <td class="val">{{ p.hv }}{% if p.unit %} <span class="u">{{ p.unit }}</span>{% endif %}</td>
+        <td class="val">{{ p.lv }}{% if p.unit %} <span class="u">{{ p.unit }}</span>{% endif %}</td></tr>
+    {% endfor %}
+  </table>
+  {% if ratings.taps %}
+  <div class="tapline">
+    {% for t in ratings.taps %}<span class="tp">{{ t.label }}: <b>{{ t.value }}</b></span>{% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+
+{{ grid(sections.get('environmental')) }}
+{{ grid(sections.get('dimensions')) }}
+
+{% if certifications %}
+{% set ns.n = ns.n + 1 %}
+<div class="section">
+  <div class="sechead"><span class="num">{{ ns.n }}</span><h2>Tests &amp; Certifications</h2><span class="ln"></span></div>
+  <table class="acclist">
+    {% for c in certifications %}
+    <tr><td class="k">{{ c.name }}</td><td class="v">{{ c.spec or '' }}</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endif %}
+
+{% if accessories %}
+<div class="section">
+  <div class="sechead"><span class="num">A</span><h2>Accessories</h2><span class="ln"></span></div>
+  <table class="acclist">
+    {% for a in accessories %}
+    <tr><td class="k">{{ a.name }}</td><td class="v">{{ a.spec or '' }}</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endif %}
+
+{% if notes %}
+<div class="section notes">
+  <div class="sechead"><span class="num">N</span><h2>Notes</h2><span class="ln"></span></div>
+  <p>{{ notes }}</p>
+</div>
+{% endif %}
+
+<div class="section notes" style="margin-top:18px; border-top:.5pt solid var(--line); padding-top:8px;">
+  <p style="font-size:7.5pt; font-style:italic;">Dimensions, weights and accessories are indicative only. Not for construction.</p>
+</div>
+
+</body></html>

@@ -12,7 +12,7 @@ ANCHORS = yaml.safe_load(open(RENDER_DIR / "anchors.yaml", encoding="utf-8"))
 
 def _fmt(v):
     try:
-        return f"{int(float(v)):,}"   # English: 3,050
+        return f"{int(float(v)):,}".replace(",", ".")   # European thousands: dot
     except (TypeError, ValueError):
         return str(v)
 
@@ -56,6 +56,53 @@ def render_pdf(parsed, meta, notes, out_path, accessories=None):
     figure_svg = build_figure_svg(parsed["image_key"], parsed["dims"]) if parsed["image_key"] else ""
     html = tpl.render(
         designation=parsed["designation"],
+        meta=meta,
+        sections={s["key"]: s for s in parsed["sections"]},
+        ratings=parsed["ratings"],
+        figure_svg=figure_svg,
+        accessories=[a for a in (accessories or []) if (a.get("name") or "").strip()],
+        notes=notes,
+    )
+    HTML(string=html, base_url=str(ROOT)).write_pdf(out_path)
+    return out_path
+
+
+def render_pdf_modern(parsed, meta, notes, out_path, accessories=None, certifications=None):
+    """Alternative layout: Space Grotesk, centered hero figure, numbered sections."""
+    from parser.extract import designation_parts, load_schema
+    env = Environment(loader=FileSystemLoader(str(RENDER_DIR)),
+                      autoescape=select_autoescape(["html"]))
+    tpl = env.get_template("template_modern.html")
+    figure_svg = build_figure_svg(parsed["image_key"], parsed["dims"]) if parsed["image_key"] else ""
+    main, voltage, serie = designation_parts(parsed["raw"], load_schema())
+    html = tpl.render(
+        designation_main=main,
+        designation_voltage=voltage,
+        designation_series=serie,
+        meta=meta,
+        sections={s["key"]: s for s in parsed["sections"]},
+        ratings=parsed["ratings"],
+        figure_svg=figure_svg,
+        accessories=[a for a in (accessories or []) if (a.get("name") or "").strip()],
+        certifications=[c for c in (certifications or []) if (c.get("name") or "").strip()],
+        notes=notes,
+    )
+    HTML(string=html, base_url=str(ROOT)).write_pdf(out_path)
+    return out_path
+
+
+def render_pdf_industrial(parsed, meta, notes, out_path, accessories=None):
+    """Alternative layout: IBM Plex Sans/Mono, drawing-cartouche register, industrial."""
+    from parser.extract import designation_parts, load_schema
+    env = Environment(loader=FileSystemLoader(str(RENDER_DIR)),
+                      autoescape=select_autoescape(["html"]))
+    tpl = env.get_template("template_industrial.html")
+    figure_svg = build_figure_svg(parsed["image_key"], parsed["dims"]) if parsed["image_key"] else ""
+    main, voltage, serie = designation_parts(parsed["raw"], load_schema())
+    sub = "  ·  ".join(p for p in [serie, voltage] if p)
+    html = tpl.render(
+        designation_main=main,
+        designation_sub=sub,
         meta=meta,
         sections={s["key"]: s for s in parsed["sections"]},
         ratings=parsed["ratings"],
