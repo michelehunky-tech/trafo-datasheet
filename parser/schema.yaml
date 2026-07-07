@@ -49,6 +49,8 @@ value_map:
     Continuo: Continuous disc
     Elicoidale: Helical
     Bobine: Coil
+    Inglobata: Cast (encapsulated)
+    Impregnata: Vacuum-impregnated
   Tipo avvolg. BT: *id001
   Tipo avvolg. ST: *id001
   Materiale MT: &id002
