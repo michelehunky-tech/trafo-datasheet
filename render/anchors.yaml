@@ -1,43 +1,137 @@
-# Axonometric calibration per transformer image.
-# For each image: native pixel size, SVG viewBox (room for the dimension lines),
-# and for each of the three dimension lines L / W / H:
-#   start: [x, y] in native pixels   dir: [dx, dy] unit vector along the axis
-#   length: line length in pixels    rot: label rotation (deg, SVG clockwise+)
-# The app draws  start -> start + dir*length  and places "<axis> <value> mm" at the midpoint.
-# Only oil_conservator_radiators is calibrated; the other three are TODO
-# (when null, the renderer falls back to a plain caption under the image).
-
+# calibrazione assonometrica — tutte le immagini usano la geometria di oil_conservator_radiators
 oil_conservator_radiators:
-  image: {w: 946, h: 759}
-  viewbox: "0 20 946 825"
-  L: {start: [96, 600], dir: [0.866, 0.5], length: 455, rot: 30}
-  W: {start: [556, 812], dir: [0.866, -0.5], length: 395, rot: -30}
-  H: {start: [52, 212], dir: [0.0, 1.0], length: 258, rot: -90}
-
+  image:
+    w: 946
+    h: 759
+  viewbox: 0 20 946 825
+  L:
+    start:
+    - 96
+    - 600
+    dir: &id001
+    - 0.866
+    - 0.5
+    length: 455
+    rot: 30
+  W:
+    start:
+    - 556
+    - 812
+    dir: &id002
+    - 0.866
+    - -0.5
+    length: 395
+    rot: -30
+  H:
+    start:
+    - 52
+    - 212
+    dir: &id003
+    - 0.0
+    - 1.0
+    length: 258
+    rot: -90
 oil_conservator_corrugated:
-  image: {w: 765, h: 774}
-  viewbox: "0 20 765 840"
-  L: {start: [82, 592], dir: [0.866, 0.5], length: 365, rot: 30}
-  W: {start: [450, 775], dir: [0.866, -0.5], length: 295, rot: -30}
-  H: {start: [52, 202], dir: [0.0, 1.0], length: 380, rot: -90}
-
+  image:
+    w: 946
+    h: 759
+  viewbox: 0 20 946 825
+  L:
+    start:
+    - 96
+    - 600
+    dir: *id001
+    length: 455
+    rot: 30
+  W:
+    start:
+    - 556
+    - 812
+    dir: *id002
+    length: 395
+    rot: -30
+  H:
+    start:
+    - 52
+    - 212
+    dir: *id003
+    length: 258
+    rot: -90
 oil_hermetic:
-  image: {w: 794, h: 737}
-  viewbox: "0 20 794 820"
-  L: {start: [60, 572], dir: [0.866, 0.5], length: 395, rot: 30}
-  W: {start: [460, 750], dir: [0.866, -0.5], length: 370, rot: -30}
-  H: {start: [30, 172], dir: [0.0, 1.0], length: 395, rot: -90}
-
+  image:
+    w: 946
+    h: 759
+  viewbox: 0 20 946 825
+  L:
+    start:
+    - 96
+    - 600
+    dir: *id001
+    length: 455
+    rot: 30
+  W:
+    start:
+    - 556
+    - 812
+    dir: *id002
+    length: 395
+    rot: -30
+  H:
+    start:
+    - 52
+    - 212
+    dir: *id003
+    length: 258
+    rot: -90
 resin_enclosure:
-  image: {w: 721, h: 757}
-  viewbox: "0 20 721 840"
-  L: {start: [22, 598], dir: [0.866, 0.5], length: 452, rot: 30}
-  W: {start: [415, 758], dir: [0.866, -0.5], length: 295, rot: -30}
-  H: {start: [22, 128], dir: [0.0, 1.0], length: 470, rot: -90}
-
+  image:
+    w: 946
+    h: 759
+  viewbox: 0 20 946 825
+  L:
+    start:
+    - 96
+    - 600
+    dir: *id001
+    length: 455
+    rot: 30
+  W:
+    start:
+    - 556
+    - 812
+    dir: *id002
+    length: 395
+    rot: -30
+  H:
+    start:
+    - 52
+    - 212
+    dir: *id003
+    length: 258
+    rot: -90
 resin_open:
-  image: {w: 530, h: 672}
-  viewbox: "0 0 530 748"
-  L: {start: [28, 615], dir: [0.866, 0.5], length: 305, rot: 30}
-  W: {start: [330, 680], dir: [0.866, -0.5], length: 135, rot: -30}
-  H: {start: [78, 55], dir: [0.0, 1.0], length: 560, rot: -90}
+  image:
+    w: 946
+    h: 759
+  viewbox: 0 20 946 825
+  L:
+    start:
+    - 96
+    - 600
+    dir: *id001
+    length: 455
+    rot: 30
+  W:
+    start:
+    - 556
+    - 812
+    dir: *id002
+    length: 395
+    rot: -30
+  H:
+    start:
+    - 52
+    - 212
+    dir: *id003
+    length: 258
+    rot: -90
