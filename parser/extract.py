@@ -65,7 +65,7 @@ def select_image(raw, family, schema):
         if not is_blank(cab):
             truthy = str(cab).strip().lower() in ("si", "sì", "yes", "y", "true", "1", "x")
             return rules["resina"]["cabina_true" if truthy else "cabina_false"]
-        return None  # no Cabina info -> ambiguous, ask in form (enclosure vs open)
+        return rules["resina"]["cabina_false"]  # default resin_open, sovrascrivibile nel form
     casa = str(raw.get("Tipo casa") or "").strip()
     branch = rules["olio"].get(casa)
     if isinstance(branch, str):

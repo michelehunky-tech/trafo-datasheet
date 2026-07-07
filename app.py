@@ -122,8 +122,22 @@ def main():
         st.info("Completa o ometti i campi, poi premi «Applica e ricontrolla».")
         return
 
+    # ---------- image selector with thumbnail ----------
+    IMAGES = ["oil_conservator_radiators", "oil_conservator_corrugated",
+              "oil_hermetic", "resin_enclosure", "resin_open"]
+    st.subheader("Immagine trasformatore")
+    cur = parsed["image_key"] or "resin_open"
+    chosen = st.selectbox("Immagine", IMAGES,
+                          index=IMAGES.index(cur) if cur in IMAGES else 0)
+    img_path = os.path.join(os.path.dirname(__file__), "assets", "transformers", f"{chosen}.png")
+    if os.path.exists(img_path):
+        st.image(img_path, width=260, caption=chosen)
+    if chosen != parsed["image_key"]:
+        answers["__image__"] = chosen
+        st.session_state["answers"] = answers
+        parsed["image_key"] = chosen
+
     # ---------- summary + generate ----------
-    st.success("Tutti i campi obbligatori sono risolti.")
     st.subheader("Riepilogo valori in scheda")
     for s in parsed["sections"]:
         with st.expander(s["title"], expanded=False):
@@ -146,7 +160,7 @@ def main():
         acc.append({"name": "", "spec": ""}); st.rerun()
     accessories = [a for a in acc if (a.get("name") or "").strip()]
 
-    # tests & certifications
+    # tests & certifications (solo layout Moderno)
     st.subheader("Tests & Certifications")
     certs = st.session_state.setdefault("certs", [])
     if certs:
