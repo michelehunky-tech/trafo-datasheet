@@ -214,7 +214,7 @@ fields:
   en: HV voltage (2nd)
   section: ratings
   family: both
-  include_in_sheet: true
+  include_in_sheet: false
   required: false
   unit: V
   decimals: 0
@@ -247,7 +247,6 @@ fields:
   required: false
   unit: '%'
   decimals: 2
-  scale: 100
 - it: Tensione BT
   en: LV voltage
   section: ratings

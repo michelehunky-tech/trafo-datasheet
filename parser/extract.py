@@ -149,10 +149,20 @@ def get_display(it_label, raw, schema):
 
 
 def build_ratings(raw, schema):
+    nf = schema["meta"]["number_format"]
     pairs = []
     for en, it_hv, it_lv, unit in RATINGS_PAIRS:
         hv = get_display(it_hv, raw, schema)
         lv = get_display(it_lv, raw, schema)
+        # doppia tensione MT: se Tensione MT2 valorizzata, mostra MT1 / MT2 sul lato HV
+        if it_hv == "Tensione MT1":
+            mt2 = raw.get("Tensione MT2")
+            if not is_blank(mt2):
+                try:
+                    if float(mt2) != 0:
+                        hv = f"{hv} / {get_display('Tensione MT2', raw, schema)}"
+                except (TypeError, ValueError):
+                    pass
         if hv is None and lv is None:
             continue
         pairs.append({"label": en, "hv": hv, "lv": lv, "unit": unit})
@@ -164,9 +174,15 @@ def build_ratings(raw, schema):
     if not is_blank(pp) or not is_blank(pm):
         taps.append({"label": "Tap positions (+/-)",
                      "value": f"{int(pp) if not is_blank(pp) else '-'} / {int(pm) if not is_blank(pm) else '-'}"})
-    step = get_display("% gradino rif. MT1", raw, schema)
-    if step:
-        taps.append({"label": "Step per tap", "value": f"{step} %"})
+    step_raw = raw.get("% gradino rif. MT1")
+    if not is_blank(step_raw):
+        try:
+            v = float(step_raw)
+            v = v * 100 if v < 1 else v  # <1 = frazione (0.0125 -> 1.25), >=1 = già percentuale
+            taps.append({"label": "Step per tap",
+                         "value": f"{format_value(v, {'decimals': 2}, nf)} %"})
+        except (TypeError, ValueError):
+            pass
     return {"pairs": pairs, "taps": taps}
 
 
