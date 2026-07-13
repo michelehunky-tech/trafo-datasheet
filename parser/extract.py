@@ -159,8 +159,12 @@ def build_ratings(raw, schema):
             mt2 = raw.get("Tensione MT2")
             if not is_blank(mt2):
                 try:
-                    if float(mt2) != 0:
-                        hv = f"{hv} / {get_display('Tensione MT2', raw, schema)}"
+                    v1 = float(raw.get("Tensione MT1"))
+                    v2 = float(mt2)
+                    if v2 != 0:
+                        lo, hi = sorted([v1, v2])
+                        hv = (f"{format_value(lo, {'decimals': 0}, nf)} / "
+                              f"{format_value(hi, {'decimals': 0}, nf)}")
                 except (TypeError, ValueError):
                     pass
         if hv is None and lv is None:

@@ -83,6 +83,7 @@ def render_pdf_modern(parsed, meta, notes, out_path, accessories=None, certifica
         sections={s["key"]: s for s in parsed["sections"]},
         ratings=parsed["ratings"],
         figure_svg=figure_svg,
+        show_cesi=(parsed["family"] == "resina"),
         accessories=[a for a in (accessories or []) if (a.get("name") or "").strip()],
         certifications=[c for c in (certifications or []) if (c.get("name") or "").strip()],
         notes=notes,

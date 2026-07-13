@@ -27,7 +27,10 @@
 <div id="pageHeader">
   <table class="hdr"><tr>
     <td class="logo"><img src="assets/logo.png"></td>
-    <td class="tag">Technical Datasheet</td>
+    <td class="tag">
+      <span class="tagtext">Technical Datasheet</span>
+      <img class="dnv" src="assets/dnv_iso.png">
+    </td>
   </tr></table>
 </div>
 
@@ -44,16 +47,28 @@
   {% if meta.offer %}<span class="badge">Offer {{ meta.offer }}</span>{% endif %}
 </div>
 
-<table class="metastrip"><tr>
-  <td style="width:28%"><span class="lbl">Client</span><span class="val">{{ meta.client or '—' }}</span></td>
-  <td style="width:28%"><span class="lbl">Project</span><span class="val">{{ meta.project or '—' }}</span></td>
-  <td style="width:22%"><span class="lbl">Date</span><span class="val">{{ meta.date or '—' }}</span></td>
-  <td style="width:22%"><span class="lbl">Pos.</span><span class="val">{{ meta.pos or '—' }}</span></td>
-</tr></table>
+<table class="metastrip">
+  <tr>
+    <td colspan="3"><span class="lbl">Project</span><span class="val">{{ meta.project or '—' }}</span></td>
+  </tr>
+  <tr>
+    <td style="width:40%"><span class="lbl">Client</span><span class="val">{{ meta.client or '—' }}</span></td>
+    <td style="width:35%"><span class="lbl">Date</span><span class="val">{{ meta.date or '—' }}</span></td>
+    <td style="width:25%"><span class="lbl">Pos.</span><span class="val">{{ meta.pos or '—' }}</span></td>
+  </tr>
+</table>
 
 {% if figure_svg %}
 <div class="herofig">
-  <div class="frame">{{ figure_svg|safe }}</div>
+  <div class="frame">
+    {% if show_cesi %}
+    <div class="cesi">
+      <img src="assets/cesi.png">
+      <span>E3-C2-F1 type test nr. B4013916</span>
+    </div>
+    {% endif %}
+    {{ figure_svg|safe }}
+  </div>
 </div>
 {% endif %}
 
@@ -71,12 +86,12 @@
         <td class="val">{{ p.hv }}{% if p.unit %} <span class="u">{{ p.unit }}</span>{% endif %}</td>
         <td class="val">{{ p.lv }}{% if p.unit %} <span class="u">{{ p.unit }}</span>{% endif %}</td></tr>
     {% endfor %}
+    {% for t in ratings.taps %}
+    <tr><td class="k">{{ t.label }}</td>
+        <td class="val">{{ t.value }}</td>
+        <td class="val">–</td></tr>
+    {% endfor %}
   </table>
-  {% if ratings.taps %}
-  <div class="tapline">
-    {% for t in ratings.taps %}<span class="tp">{{ t.label }}: <b>{{ t.value }}</b></span>{% endfor %}
-  </div>
-  {% endif %}
 </div>
 {% endif %}
 

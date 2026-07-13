@@ -50,7 +50,7 @@ value_map:
     Elicoidale: Helical
     Bobine: Coil
     Inglobata: Cast (encapsulated)
-    Impregnata: Vacuum-impregnated
+    Impregnata: Impregnated
   Tipo avvolg. BT: *id001
   Tipo avvolg. ST: *id001
   Materiale MT: &id002
@@ -96,7 +96,7 @@ fields:
   include_in_sheet: true
   required: true
 - it: Temp. Ambiente MIN
-  en: Ambient temperature min
+  en: Min ambient temperature
   section: environmental
   family: both
   include_in_sheet: true
@@ -104,7 +104,7 @@ fields:
   unit: °C
   decimals: 0
 - it: Temp. Ambiente MAX
-  en: Ambient temperature max
+  en: Max ambient temperature
   section: environmental
   family: both
   include_in_sheet: true
@@ -512,7 +512,7 @@ fields:
   include_in_sheet: true
   required: true
 - it: Interasse ruote
-  en: Wheel gauge
+  en: Distance between wheels
   section: dimensions
   family: both
   include_in_sheet: true
