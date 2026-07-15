@@ -30,17 +30,27 @@ def load_schema(path=SCHEMA_PATH):
 
 
 def read_raw(xlsx_path, schema):
-    """Return {italian_label: raw_value} read by label from the key-value sheet."""
+    """Return (raw, accessories): key-value fields read by label, and the
+    accessory list (rows after the 'Accessori:' marker)."""
     meta = schema["meta"]
     wb = load_workbook(xlsx_path, data_only=True)
     ws = wb[meta["sheet"]] if meta["sheet"] in wb.sheetnames else wb[wb.sheetnames[0]]
-    raw = {}
+    marker = meta.get("accessories_marker", "Accessori:")
+    raw, accessories, in_acc = {}, [], False
     for r in range(meta["first_row"], ws.max_row + 1):
         label = ws.cell(r, meta["label_col"]).value
         value = ws.cell(r, meta["value_col"]).value
-        if label is not None and str(label).strip():
-            raw[str(label).strip()] = value
-    return raw
+        if label is None or not str(label).strip():
+            continue
+        label = str(label).strip()
+        if label == marker:
+            in_acc = True
+            continue
+        if in_acc:
+            accessories.append(label)          # accessory descriptions are full sentences
+        else:
+            raw[label] = value
+    return raw, accessories
 
 
 def derive_family(raw, schema):
@@ -124,15 +134,75 @@ def grouped_sections(fields):
     return groups
 
 
-RATINGS_PAIRS = [
-    ("Rated power", "Potenza nominale", "Potenza nominale", "kVA"),
-    ("Voltage", "Tensione MT1", "Tensione BT", "V"),
-    ("Insulation level", "Classe isolamento MT", "Classe isolamento BT", "kV"),
-    ("Winding material", "Materiale MT", "Materiale BT", None),
-    ("Winding type", "Tipo avvolg. MT", "Tipo avvolg. BT", None),
-    ("Connection", "Collegamento MT", "Collegamento BT", None),
-    ("Thermal class", "Classe termica MT", "Classe termica BT", None),
+# --- multi-winding configuration ---
+WINDINGS = [
+    ("MT",  {"V": "Tensione MT", "V2": "Tensione MT2", "P": "Potenza nominale MT",
+             "conn": "Collegamento MT", "ins": "Classe isolamento MT", "mat": "Materiale MT",
+             "wt": "Tipo avvolg. MT", "tc": "Classe termica MT", "tr": "Sovratemperatura avvolg. MT"}),
+    ("BT1", {"V": "Tensione BT1", "P": "Potenza nominale BT1",
+             "conn": "Collegamento BT1", "ins": "Classe isolamento BT1", "mat": "Materiale BT1",
+             "wt": "Tipo avvolg. BT1", "tc": "Classe termica BT1", "tr": "Sovratemperatura avvolg. BT1"}),
+    ("BT2", {"V": "Tensione BT2", "P": "Potenza nominale BT2",
+             "conn": "Collegamento BT2", "ins": "Classe isolamento BT2", "mat": "Materiale BT2",
+             "wt": "Tipo avvolg. BT2", "tc": "Classe termica BT2", "tr": "Sovratemperatura avvolg. BT2"}),
 ]
+WINDING_ROWS = [
+    ("Rated power", "P", "kVA"),
+    ("Voltage", "V", "V"),
+    ("Connection", "conn", None),
+    ("Insulation level", "ins", "kV"),
+    ("Winding material", "mat", None),
+    ("Winding type", "wt", None),
+    ("Thermal class", "tc", None),
+    ("Winding temp. rise", "tr", "°C"),
+]
+IMPEDANCES = [
+    ("Impedenza di cortocircuito % MT-BT1", "MT", "BT1"),
+    ("Impedenza di cortocircuito % MT-BT2", "MT", "BT2"),
+    ("Impedenza di cortocircuito % BT1-BT2", "BT1", "BT2"),
+]
+
+
+def _f(v):
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return None
+
+
+def _imp(v, nf):
+    if is_blank(v):
+        return None
+    if isinstance(v, (int, float)) and not isinstance(v, bool):
+        return format_value(v, {"decimals": 2}, nf)
+    return str(v).strip()  # valori testuali: NA, < 3
+
+
+def build_windings(raw, schema):
+    """Avvolgimenti presenti con sigla LV/MV/HV (numerata se la classe si ripete)."""
+    vc = schema["voltage_class"]
+    present = []
+    for role, m in WINDINGS:
+        v = _f(raw.get(m["V"]))
+        if v is None or v == 0:
+            continue
+        ref = v
+        v2 = _f(raw.get(m.get("V2")))
+        if v2:
+            ref = max(v, v2)  # doppia tensione: classifica sulla massima
+        base = "LV" if ref <= vc["lv_max"] else ("MV" if ref <= vc["mv_max"] else "HV")
+        present.append({"role": role, "base": base, "m": m})
+    from collections import Counter
+    cnt = Counter(w["base"] for w in present)
+    seen = {}
+    for w in present:
+        b = w["base"]
+        if cnt[b] > 1:
+            seen[b] = seen.get(b, 0) + 1
+            w["label"] = f"{b}{seen[b]}"
+        else:
+            w["label"] = b
+    return present
 
 
 def _field_by_it(schema, it):
@@ -150,55 +220,106 @@ def get_display(it_label, raw, schema):
 
 def build_ratings(raw, schema):
     nf = schema["meta"]["number_format"]
-    pairs = []
-    for en, it_hv, it_lv, unit in RATINGS_PAIRS:
-        hv = get_display(it_hv, raw, schema)
-        lv = get_display(it_lv, raw, schema)
-        # doppia tensione MT: se Tensione MT2 valorizzata, mostra MT1 / MT2 sul lato HV
-        if it_hv == "Tensione MT1":
-            mt2 = raw.get("Tensione MT2")
-            if not is_blank(mt2):
-                try:
-                    v1 = float(raw.get("Tensione MT1"))
-                    v2 = float(mt2)
-                    if v2 != 0:
-                        lo, hi = sorted([v1, v2])
-                        hv = (f"{format_value(lo, {'decimals': 0}, nf)} / "
-                              f"{format_value(hi, {'decimals': 0}, nf)}")
-                except (TypeError, ValueError):
-                    pass
-        if hv is None and lv is None:
-            continue
-        pairs.append({"label": en, "hv": hv, "lv": lv, "unit": unit})
+    windings = build_windings(raw, schema)
+    labels = [w["label"] for w in windings]
+    rolelabel = {w["role"]: w["label"] for w in windings}
+
+    rows = []
+    for en, key, unit in WINDING_ROWS:
+        cells = []
+        for w in windings:
+            m = w["m"]
+            val = get_display(m[key], raw, schema)
+            if key == "V" and w["role"] == "MT":            # doppia tensione MT: min / max
+                v1, v2 = _f(raw.get(m["V"])), _f(raw.get(m.get("V2")))
+                if v1 and v2 and v2 != 0:
+                    lo, hi = sorted([v1, v2])
+                    val = (f"{format_value(lo, {'decimals':0}, nf)} / "
+                           f"{format_value(hi, {'decimals':0}, nf)}")
+            cells.append(val if val not in (None, "") else "–")
+        if any(c != "–" for c in cells):
+            rows.append({"label": en, "unit": unit, "cells": cells})
+
+    # impedenze: coppie se due secondari, altrimenti valore singolo
+    impedances = []
+    if "BT2" in rolelabel:
+        for key, w1, w2 in IMPEDANCES:
+            if w1 not in rolelabel or w2 not in rolelabel:
+                continue
+            val = _imp(raw.get(key), nf)
+            if val is not None:
+                impedances.append({"label": f"Short-circuit impedance ({rolelabel[w1]}–{rolelabel[w2]})",
+                                   "value": val, "unit": "%"})
+    else:
+        val = (_imp(raw.get("Impedenza di cortocircuito % Totale"), nf)
+               or _imp(raw.get("Impedenza di cortocircuito % MT-BT1"), nf))
+        if val is not None:
+            impedances.append({"label": "Short-circuit impedance", "value": val, "unit": "%"})
+
+    # tap changer
     taps = []
     tc = get_display("Tipo commutatore", raw, schema)
     if tc:
         taps.append({"label": "Tap changer", "value": tc})
-    pp, pm = raw.get("Posizioni + rif. MT1"), raw.get("Posizioni - rif. MT1")
+    pp, pm = raw.get("Posizioni + rif. MT"), raw.get("Posizioni - rif. MT")
     if not is_blank(pp) or not is_blank(pm):
         taps.append({"label": "Tap positions (+/-)",
                      "value": f"{int(pp) if not is_blank(pp) else '-'} / {int(pm) if not is_blank(pm) else '-'}"})
-    step_raw = raw.get("% gradino rif. MT1")
-    if not is_blank(step_raw):
+    step = raw.get("% gradino rif. MT")
+    if not is_blank(step):
         try:
-            v = float(step_raw)
-            v = v * 100 if v < 1 else v  # <1 = frazione (0.0125 -> 1.25), >=1 = già percentuale
-            taps.append({"label": "Step per tap",
-                         "value": f"{format_value(v, {'decimals': 2}, nf)} %"})
+            v = float(step)
+            v = v * 100 if v < 1 else v
+            taps.append({"label": "Step per tap", "value": f"{format_value(v, {'decimals':2}, nf)} %"})
         except (TypeError, ValueError):
             pass
-    return {"pairs": pairs, "taps": taps}
+
+    return {"windings": labels, "rows": rows, "impedances": impedances, "taps": taps}
+
+
+def efficiency_row(raw, schema):
+    val = raw.get("PEI / MEPS / HEPS in AN/ONAN")
+    if is_blank(val):
+        return None
+    norme = " ".join(str(raw.get(f"Norma {i} / Regol. {i}") or "") for i in range(1, 5)).upper()
+    eff = schema["efficiency"]
+    if any(t.upper() in norme for t in eff["meps_when"]):
+        label = "Efficiency index (MEPS/HEPS)"
+    elif any(t.upper() in norme for t in eff["pei_when"]):
+        label = "Efficiency index (PEI)"
+    else:
+        label = "Efficiency index"
+    return {"it": None, "en": label, "section": "electrical", "unit": "%",
+            "value": format_value(val, {"decimals": 2}, schema["meta"]["number_format"]),
+            "blank": False, "translated_ok": True}
+
+
+def standards_row(raw):
+    xs = [str(raw.get(f"Norma {i} / Regol. {i}")).strip()
+          for i in range(1, 5) if not is_blank(raw.get(f"Norma {i} / Regol. {i}"))]
+    if not xs:
+        return None
+    return {"it": None, "en": "Standards / Regulations", "section": "general", "unit": None,
+            "value": " · ".join(xs), "blank": False, "translated_ok": True}
+
+
+def cesi_text(raw, family):
+    if family != "resina":
+        return None
+    cls = raw.get("Classe amb / clim / fuoco")
+    if is_blank(cls):
+        return None
+    return f"{str(cls).replace(' ', '')} type test nr. B4013916"
 
 
 def designation(raw, schema):
     nf = schema["meta"]["number_format"]
     serie = str(raw.get("Serie") or "").strip()
-    parts = [serie] if serie else []
     tail = []
-    power = raw.get("Potenza nominale")
+    power = raw.get("Potenza nominale MT")
     if not is_blank(power):
         tail.append(f"{format_value(power, {'decimals':0}, nf)} kVA")
-    hv, lv = raw.get("Tensione MT1"), raw.get("Tensione BT")
+    hv, lv = raw.get("Tensione MT"), raw.get("Tensione BT1")
     if not is_blank(hv) and not is_blank(lv):
         tail.append(f"{format_value(hv, {'decimals':0}, nf)} / {format_value(lv, {'decimals':0}, nf)} V")
     elif not is_blank(hv):
@@ -209,13 +330,12 @@ def designation(raw, schema):
 
 
 def designation_parts(raw, schema):
-    """Three separate strings for the modern layout title:
-    main = power (big headline),  voltage = HV/LV voltage string,  series = serie code."""
+    """main = potenza (titolone), voltage = MT/BT, series = codice serie."""
     nf = schema["meta"]["number_format"]
     serie = str(raw.get("Serie") or "").strip()
-    power = raw.get("Potenza nominale")
+    power = raw.get("Potenza nominale MT")
     main = f"{format_value(power, {'decimals':0}, nf)} kVA" if not is_blank(power) else (serie or "Transformer")
-    hv, lv = raw.get("Tensione MT1"), raw.get("Tensione BT")
+    hv, lv = raw.get("Tensione MT"), raw.get("Tensione BT1")
     if not is_blank(hv) and not is_blank(lv):
         voltage = f"{format_value(hv, {'decimals':0}, nf)} / {format_value(lv, {'decimals':0}, nf)} V"
     elif not is_blank(hv):
@@ -227,14 +347,22 @@ def designation_parts(raw, schema):
 
 def parse(xlsx_path, schema=None, overrides=None):
     schema = schema or load_schema()
-    raw = read_raw(xlsx_path, schema)
+    raw, accessories = read_raw(xlsx_path, schema)
     if overrides:
         for k, v in overrides.items():
             raw[k] = v  # corrected / supplied values from the dynamic form
     family = derive_family(raw, schema)
     ov = overrides or {}
     image_key = ov.get("__image__") or ov.get("image") or select_image(raw, family, schema)
+
     fields = build_fields(raw, family, schema)
+    std = standards_row(raw)
+    eff = efficiency_row(raw, schema)
+    if std:
+        fields.append(std)
+    if eff:
+        fields.append(eff)
+
     return {
         "raw": raw,
         "family": family,
@@ -243,6 +371,8 @@ def parse(xlsx_path, schema=None, overrides=None):
         "fields": fields,
         "sections": grouped_sections(fields),
         "ratings": build_ratings(raw, schema),
+        "cesi": cesi_text(raw, family),
+        "accessories_excel": accessories,
         "dims": {
             "L": raw.get("Lunghezza trafo"),
             "W": raw.get("Larghezza trafo"),

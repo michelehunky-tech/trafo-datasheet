@@ -80,7 +80,7 @@ table.hvlv2{width:100%; border-collapse:collapse;}
 table.hvlv2 th{font-size:6.5pt; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
   text-align:left; padding:5px 8px; background:var(--panel); color:var(--ink-soft);}
 table.hvlv2 td{padding:5px 8px; border-bottom:.75pt solid var(--line); font-size:9pt;}
-table.hvlv2 td.k{width:44%; color:var(--ink-soft);}
+table.hvlv2 td.k{width:34%; color:var(--ink-soft);}
 table.hvlv2 td.val{font-weight:600;}
 .herofig .frame{position:relative;}
 .cesi{position:absolute; top:10px; right:12px; text-align:right; z-index:2;}
@@ -92,6 +92,7 @@ table.hvlv2 td.val{font-weight:600;}
 .acclist td{padding:6px 0; border-bottom:.75pt solid var(--line); font-size:9pt;}
 .acclist td.k{font-weight:600; width:46%;}
 .acclist td.v{color:var(--ink-soft);}
+.acclist td.acc1{padding:4px 0; border-bottom:.5pt solid var(--line); font-size:8.5pt;}
 
 /* ---- notes: full width, quiet ---- */
 .notes p{margin:0; font-size:8.5pt; color:var(--ink-soft); line-height:1.5;}

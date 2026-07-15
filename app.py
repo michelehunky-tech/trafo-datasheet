@@ -56,6 +56,7 @@ def main():
         st.session_state["uploaded"] = up.name
         st.session_state.pop("answers", None)
         st.session_state.pop("omitted", None)
+        st.session_state.pop("acc_text", None)
 
     # portal meta inputs
     st.subheader("Dati commessa")
@@ -144,21 +145,12 @@ def main():
             for r in s["rows"]:
                 st.write(f"- {r['en']}: **{r['value']}**" + (f" {r['unit']}" if r["unit"] else ""))
 
-    # accessories
+    # accessories: precompilati dall'Excel, uno per riga, modificabili
     st.subheader("Accessories")
-    acc = st.session_state.setdefault("acc", [])
-    if acc:
-        h1, h2, _ = st.columns([3, 3, 1])
-        h1.caption("Accessory"); h2.caption("Characteristic")
-    for i, row in enumerate(acc):
-        c1, c2, c3 = st.columns([3, 3, 1])
-        row["name"] = c1.text_input("Accessory", row.get("name", ""), key=f"acc_n_{i}", label_visibility="collapsed")
-        row["spec"] = c2.text_input("Characteristic", row.get("spec", ""), key=f"acc_s_{i}", label_visibility="collapsed")
-        if c3.button("✕", key=f"acc_d_{i}"):
-            acc.pop(i); st.rerun()
-    if st.button("+ Aggiungi accessorio"):
-        acc.append({"name": "", "spec": ""}); st.rerun()
-    accessories = [a for a in acc if (a.get("name") or "").strip()]
+    if "acc_text" not in st.session_state:
+        st.session_state["acc_text"] = "\n".join(parsed.get("accessories_excel", []))
+    acc_text = st.text_area("Accessori (uno per riga)", height=220, key="acc_text")
+    accessories = [l.strip() for l in acc_text.split("\n") if l.strip()]
 
     # tests & certifications (solo layout Moderno)
     st.subheader("Tests & Certifications")

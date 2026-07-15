@@ -61,10 +61,10 @@
 {% if figure_svg %}
 <div class="herofig">
   <div class="frame">
-    {% if show_cesi %}
+    {% if cesi %}
     <div class="cesi">
       <img src="assets/cesi.png">
-      <span>E3-C2-F1 type test nr. B4013916</span>
+      <span>{{ cesi }}</span>
     </div>
     {% endif %}
     {{ figure_svg|safe }}
@@ -75,21 +75,29 @@
 {{ grid(sections.get('general')) }}
 {{ grid(sections.get('electrical')) }}
 
-{% if ratings and ratings.pairs %}
+{% if ratings and ratings.windings %}
 {% set ns.n = ns.n + 1 %}
+{% set nw = ratings.windings|length %}
 <div class="section">
   <div class="sechead"><span class="num">{{ ns.n }}</span><h2>Ratings</h2><span class="ln"></span></div>
   <table class="hvlv2">
-    <tr><th>Parameter</th><th>HV (MV)</th><th>LV</th></tr>
-    {% for p in ratings.pairs %}
-    <tr><td class="k">{{ p.label }}</td>
-        <td class="val">{{ p.hv }}{% if p.unit %} <span class="u">{{ p.unit }}</span>{% endif %}</td>
-        <td class="val">{{ p.lv }}{% if p.unit %} <span class="u">{{ p.unit }}</span>{% endif %}</td></tr>
+    <tr><th>Parameter</th>{% for w in ratings.windings %}<th>{{ w }}</th>{% endfor %}</tr>
+    {% for row in ratings.rows %}
+    <tr><td class="k">{{ row.label }}</td>
+      {% for c in row.cells %}<td class="val">{{ c }}{% if row.unit and c != '–' %} <span class="u">{{ row.unit }}</span>{% endif %}</td>{% endfor %}
+    </tr>
+    {% endfor %}
+    {% for imp in ratings.impedances %}
+    <tr><td class="k">{{ imp.label }}</td>
+      <td class="val">{{ imp.value }} <span class="u">{{ imp.unit }}</span></td>
+      {% for i in range(nw - 1) %}<td class="val">–</td>{% endfor %}
+    </tr>
     {% endfor %}
     {% for t in ratings.taps %}
     <tr><td class="k">{{ t.label }}</td>
-        <td class="val">{{ t.value }}</td>
-        <td class="val">–</td></tr>
+      <td class="val">{{ t.value }}</td>
+      {% for i in range(nw - 1) %}<td class="val">–</td>{% endfor %}
+    </tr>
     {% endfor %}
   </table>
 </div>
@@ -115,7 +123,7 @@
   <div class="sechead"><span class="num">A</span><h2>Accessories</h2><span class="ln"></span></div>
   <table class="acclist">
     {% for a in accessories %}
-    <tr><td class="k">{{ a.name }}</td><td class="v">{{ a.spec or '' }}</td></tr>
+    <tr><td class="acc1">{{ a }}</td></tr>
     {% endfor %}
   </table>
 </div>

@@ -3,13 +3,14 @@ meta:
   label_col: 1
   value_col: 2
   first_row: 2
-  last_row: 73
+  last_row: 94
+  accessories_marker: 'Accessori:'
   datasheet_language: en
   number_format:
     decimal: ','
-    thousands: '.'
+    thousands: .
 family_rules:
-  _doc: 'Order: oil if ''Tipologia olio'' present; resin if Raffreddamento in air set; else oil.'
+  _doc: oil if 'Tipologia olio' present; resin if air cooling; else oil.
   air_cooling:
   - AN
   - AF
@@ -18,7 +19,6 @@ family_rules:
   - O
   - K
 image_rules:
-  _doc: family+casa+cooling -> image key
   resina:
     cabina_true: resin_enclosure
     cabina_false: resin_open
@@ -30,7 +30,17 @@ image_rules:
 suspicious:
   date_coerced_fields:
   - Classe isolamento MT
-  - Classe isolamento BT
+  - Classe isolamento BT1
+  - Classe isolamento BT2
+voltage_class:
+  lv_max: 3600
+  mv_max: 52000
+efficiency:
+  pei_when:
+  - '548'
+  meps_when:
+  - AS 60076
+  - AS60076
 value_map:
   Tipo casa:
     Conservatore: Conservator
@@ -43,7 +53,23 @@ value_map:
     A vuoto: Off-circuit tap changer (DETC)
     Reg. a vuoto: Off-circuit tap changer (DETC)
     Nessuno: None
-  Tipo avvolg. MT: &id001
+  Applicazione:
+    Distribuzione: Distribution
+    Conversione: Conversion
+    Trasmissione: Transmission
+    Trazione: Traction
+    Fotovoltaico: Photovoltaic
+    Eolico: Wind
+  Installazione:
+    Interno / Esterno: Indoor / Outdoor
+    Interno: Indoor
+    Esterno: Outdoor
+  Materiale MT: &id001
+    Al: Aluminium
+    Cu: Copper
+  Materiale BT1: *id001
+  Materiale BT2: *id001
+  Tipo avvolg. MT: &id002
     Strati: Layer
     Dischi: Disc
     Continuo: Continuous disc
@@ -51,26 +77,9 @@ value_map:
     Bobine: Coil
     Inglobata: Cast (encapsulated)
     Impregnata: Impregnated
-  Tipo avvolg. BT: *id001
-  Tipo avvolg. ST: *id001
-  Materiale MT: &id002
-    Al: Aluminium
-    Cu: Copper
-  Materiale BT: *id002
-  Materiale ST: *id002
+  Tipo avvolg. BT1: *id002
+  Tipo avvolg. BT2: *id002
 fields:
-- it: Codifica foglio calcolo
-  en: Calc sheet code
-  section: _internal
-  family: both
-  include_in_sheet: false
-  required: false
-- it: Codice prodotto
-  en: Product code
-  section: header
-  family: both
-  include_in_sheet: true
-  required: false
 - it: Serie
   en: Series
   section: general
@@ -95,6 +104,103 @@ fields:
   family: both
   include_in_sheet: true
   required: true
+- it: Applicazione
+  en: Application
+  section: general
+  family: both
+  include_in_sheet: true
+  required: false
+- it: Tipologia olio
+  en: Oil type
+  section: general
+  family: olio
+  include_in_sheet: true
+  required: false
+- it: Classe amb / clim / fuoco
+  en: Environmental / climatic / fire class
+  section: general
+  family: resina
+  include_in_sheet: true
+  required: false
+- it: Installazione
+  en: Installation
+  section: general
+  family: both
+  include_in_sheet: true
+  required: false
+- it: Protezione superficiale
+  en: Surface protection
+  section: general
+  family: both
+  include_in_sheet: true
+  required: false
+- it: Colore
+  en: Paint colour
+  section: general
+  family: both
+  include_in_sheet: true
+  required: false
+- it: THDi
+  en: Loading application (THDi)
+  section: general
+  family: both
+  include_in_sheet: true
+  required: false
+  unit: '%'
+  decimals: 1
+- it: Numero fasi
+  en: Number of phases
+  section: electrical
+  family: both
+  include_in_sheet: true
+  required: true
+  decimals: 0
+- it: Frequenza
+  en: Frequency
+  section: electrical
+  family: both
+  include_in_sheet: true
+  required: true
+  unit: Hz
+  decimals: 0
+- it: Gruppo vettoriale
+  en: Vector group
+  section: electrical
+  family: both
+  include_in_sheet: true
+  required: true
+- it: Perdite a vuoto
+  en: No-load losses
+  section: electrical
+  family: both
+  include_in_sheet: true
+  required: true
+  unit: W
+  decimals: 0
+- it: Perdite a carico 75°C
+  en: Load losses 75°C
+  section: electrical
+  family: olio
+  include_in_sheet: true
+  required: false
+  unit: W
+  decimals: 0
+- it: Perdite a carico 120°C
+  en: Load losses 120°C
+  section: electrical
+  family: resina
+  include_in_sheet: true
+  required: false
+  unit: W
+  decimals: 0
+- it: Corrente a vuoto %
+  en: No-load current
+  section: electrical
+  family: both
+  include_in_sheet: true
+  required: false
+  unit: '%'
+  decimals: 1
 - it: Temp. Ambiente MIN
   en: Min ambient temperature
   section: environmental
@@ -119,308 +225,10 @@ fields:
   required: false
   unit: m a.s.l.
   decimals: 0
-- it: THDi
-  en: Loading application (THDi)
-  section: general
-  family: both
-  include_in_sheet: true
-  required: false
-  unit: '%'
-  decimals: 1
-- it: Potenza nominale
-  en: Rated power
-  section: ratings
-  family: both
-  include_in_sheet: true
-  required: true
-  unit: kVA
-  decimals: 0
-- it: Potenza reg. forzato
-  en: Forced-cooling power
-  section: ratings
-  family: olio
-  include_in_sheet: true
-  required: false
-  unit: kVA
-  decimals: 0
-  suppress_if_zero: true
-- it: Potenza reattiva
-  en: Reactive power
-  section: ratings
-  family: both
-  include_in_sheet: false
-  required: false
-  unit: kVAr
-  decimals: 0
-  suppress_if_zero: true
-- it: Avvolg. stabilizzatore? Per trafo EAR
-  en: Stabilizing winding
-  section: _internal
-  family: both
-  include_in_sheet: false
-  required: false
-- it: Avvolg. ausiliario? Per trafo EAR
-  en: Auxiliary winding
-  section: _internal
-  family: both
-  include_in_sheet: false
-  required: false
-- it: Regolazione? Per trafo EAR
-  en: Regulation (EAR)
-  section: _internal
-  family: both
-  include_in_sheet: false
-  required: false
-- it: Corrente guasto omopolare
-  en: Zero-sequence fault current
-  section: _internal
-  family: both
-  include_in_sheet: false
-  required: false
-- it: Durata guasto omopolare
-  en: Zero-sequence fault duration
-  section: _internal
-  family: both
-  include_in_sheet: false
-  required: false
-- it: Corrente guasto permanente
-  en: Permanent fault current
-  section: _internal
-  family: both
-  include_in_sheet: false
-  required: false
-- it: Numero fasi
-  en: Number of phases
-  section: electrical
-  family: both
-  include_in_sheet: true
-  required: true
-  decimals: 0
-- it: Frequenza
-  en: Frequency
-  section: electrical
-  family: both
-  include_in_sheet: true
-  required: true
-  unit: Hz
-  decimals: 0
-- it: Tensione MT1
-  en: HV voltage
-  section: ratings
-  family: both
-  include_in_sheet: true
-  required: true
-  unit: V
-  decimals: 0
-- it: Tensione MT2
-  en: HV voltage (2nd)
-  section: ratings
-  family: both
-  include_in_sheet: false
-  required: false
-  unit: V
-  decimals: 0
-  suppress_if_zero: true
-- it: Tipo commutatore
-  en: Tap changer
-  section: ratings
-  family: both
-  include_in_sheet: true
-  required: false
-- it: Posizioni + rif. MT1
-  en: Tap positions (+)
-  section: ratings
-  family: both
-  include_in_sheet: true
-  required: false
-  decimals: 0
-- it: Posizioni - rif. MT1
-  en: Tap positions (-)
-  section: ratings
-  family: both
-  include_in_sheet: true
-  required: false
-  decimals: 0
-- it: '% gradino rif. MT1'
-  en: Step per tap
-  section: ratings
-  family: both
-  include_in_sheet: true
-  required: false
-  unit: '%'
-  decimals: 2
-- it: Tensione BT
-  en: LV voltage
-  section: ratings
-  family: both
-  include_in_sheet: true
-  required: true
-  unit: V
-  decimals: 0
-- it: Collegamento MT
-  en: HV connection
-  section: electrical
-  family: both
-  include_in_sheet: false
-  required: false
-- it: Collegamento BT
-  en: LV connection
-  section: electrical
-  family: both
-  include_in_sheet: false
-  required: false
-- it: Collegamento TER
-  en: TER connection
-  section: electrical
-  family: both
-  include_in_sheet: false
-  required: false
-  suppress_if_zero: true
-- it: Indice orario
-  en: Clock index
-  section: electrical
-  family: both
-  include_in_sheet: false
-  required: false
-  decimals: 0
-- it: Gruppo vettoriale
-  en: Vector group
-  section: electrical
-  family: both
-  include_in_sheet: true
-  required: true
-- it: Perdite a vuoto
-  en: No-load losses
-  section: electrical
-  family: both
-  include_in_sheet: true
-  required: true
-  unit: W
-  decimals: 0
-- it: Perdite a carico 75°C
-  en: Load losses 75°C
-  section: electrical
-  family: olio
-  include_in_sheet: true
-  required: true
-  unit: W
-  decimals: 0
-- it: Perdite a carico 120°C
-  en: Load losses 120°C
-  section: electrical
-  family: resina
-  include_in_sheet: true
-  required: true
-  unit: W
-  decimals: 0
-- it: Corrente a vuoto %
-  en: No-load current
-  section: electrical
-  family: both
-  include_in_sheet: true
-  required: false
-  unit: '%'
-  decimals: 1
-- it: Impedenza di cortocircuito %
-  en: Short-circuit impedance
-  section: electrical
-  family: both
-  include_in_sheet: true
-  required: true
-  unit: '%'
-  decimals: 2
-- it: PEI / MEPS / HEPS in AN/ONAN
-  en: Efficiency index (PEI)
-  section: electrical
-  family: both
-  include_in_sheet: true
-  required: false
-  unit: '%'
-  decimals: 2
-- it: Classe termica MT
-  en: HV thermal class
-  section: ratings
-  family: both
-  include_in_sheet: true
-  required: false
-- it: Classe termica BT
-  en: LV thermal class
-  section: ratings
-  family: both
-  include_in_sheet: true
-  required: false
-- it: Classe isolamento MT
-  en: HV insulation level
-  section: ratings
-  family: both
-  include_in_sheet: true
-  required: true
-  unit: kV
-- it: Classe isolamento BT
-  en: LV insulation level
-  section: ratings
-  family: both
-  include_in_sheet: true
-  required: true
-  unit: kV
-- it: Materiale MT
-  en: HV winding material
-  section: ratings
-  family: both
-  include_in_sheet: true
-  required: false
-- it: Materiale BT
-  en: LV winding material
-  section: ratings
-  family: both
-  include_in_sheet: true
-  required: false
-- it: Materiale ST
-  en: TER winding material
-  section: ratings
-  family: both
-  include_in_sheet: true
-  required: false
-  suppress_if_zero: true
-- it: Tipo avvolg. MT
-  en: HV winding type
-  section: ratings
-  family: both
-  include_in_sheet: true
-  required: false
-- it: Tipo avvolg. BT
-  en: LV winding type
-  section: ratings
-  family: both
-  include_in_sheet: true
-  required: false
-- it: Tipo avvolg. ST
-  en: TER winding type
-  section: ratings
-  family: both
-  include_in_sheet: true
-  required: false
-  suppress_if_zero: true
 - it: Sovratemperatura olio
   en: Oil temperature rise
   section: environmental
   family: olio
-  include_in_sheet: true
-  required: false
-  unit: °C
-  decimals: 0
-- it: Sovratemperatura avvolg. MT
-  en: HV winding temp. rise
-  section: environmental
-  family: both
-  include_in_sheet: true
-  required: false
-  unit: °C
-  decimals: 0
-- it: Sovratemperatura avvolg. BT
-  en: LV winding temp. rise
-  section: environmental
-  family: both
   include_in_sheet: true
   required: false
   unit: °C
@@ -441,30 +249,6 @@ fields:
   required: false
   unit: dBA
   decimals: 0
-- it: Zo
-  en: Zero-seq. impedance Zo
-  section: _internal
-  family: both
-  include_in_sheet: false
-  required: false
-- it: Ro
-  en: Zero-seq. resistance Ro
-  section: _internal
-  family: both
-  include_in_sheet: false
-  required: false
-- it: Xo
-  en: Zero-seq. reactance Xo
-  section: _internal
-  family: both
-  include_in_sheet: false
-  required: false
-- it: Classe amb / clim / fuoco
-  en: Environmental / climatic / fire class
-  section: general
-  family: resina
-  include_in_sheet: true
-  required: true
 - it: Lunghezza trafo
   en: Length
   section: dimensions
@@ -505,12 +289,6 @@ fields:
   required: false
   unit: kg
   decimals: 0
-- it: Tipologia olio
-  en: Oil type
-  section: general
-  family: olio
-  include_in_sheet: true
-  required: true
 - it: Interasse ruote
   en: Distance between wheels
   section: dimensions
@@ -527,48 +305,3 @@ fields:
   required: false
   unit: mm
   decimals: 0
-- it: Cabina
-  en: Enclosure
-  section: _internal
-  family: resina
-  include_in_sheet: false
-  required: false
-- it: K inserzione
-  en: Inrush factor
-  section: _internal
-  family: both
-  include_in_sheet: false
-  required: false
-- it: Costante di tempo (sec)
-  en: Time constant
-  section: _internal
-  family: both
-  include_in_sheet: false
-  required: false
-  unit: s
-- it: Tempo emivalore (msec)
-  en: Half-value time
-  section: _internal
-  family: both
-  include_in_sheet: false
-  required: false
-  unit: ms
-- it: Induzione nucleo
-  en: Core induction
-  section: _internal
-  family: both
-  include_in_sheet: false
-  required: false
-  unit: T
-- it: Densità corrente MT (Sn/Pos Nom)
-  en: HV current density
-  section: _internal
-  family: both
-  include_in_sheet: false
-  required: false
-- it: Densità corrente BT (Sn/Pos Nom)
-  en: LV current density
-  section: _internal
-  family: both
-  include_in_sheet: false
-  required: false
