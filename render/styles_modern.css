@@ -56,6 +56,9 @@ body{margin:0;}
 .herofig{margin:16px 0 4px; text-align:center; page-break-inside:avoid;}
 .herofig .frame{background:var(--white); border:1pt solid var(--line); border-radius:0; padding:14px 10px 10px;}
 .herofig .figsvg{display:block; width:52%; height:auto; margin:0 auto;}
+.herofig .figimg{display:block; width:52%; height:auto; max-height:150mm; margin:0 auto;}
+.herofig .dimcap{margin-top:10px; font-size:8.5pt; font-weight:500; color:var(--ink-soft); text-align:center;}
+.herofig .dimcap .lbl{display:block; font-size:6.5pt; letter-spacing:.14em; text-transform:uppercase; margin-bottom:2px;}
 .herofig .capline{margin-top:10px; font-size:8.5pt; font-weight:500; color:var(--ink-soft);}
 .herofig .capline b{color:var(--ink); font-weight:600;}
 
