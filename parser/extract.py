@@ -67,23 +67,62 @@ def derive_family(raw, schema):
     return "resina" if "-R" in serie.upper() else "olio"
 
 
+IMG_DIR = Path(__file__).resolve().parent.parent / "assets" / "transformers"
+
+
+def _img_exists(key):
+    return bool(key) and (IMG_DIR / f"{key}.png").exists()
+
+
+def _winding_pair(windings):
+    """Coppia di sigle senza numeri (es. 'MV-LV', 'MV-MV', 'HV-MV'); con 3 avvolgimenti
+    prende primario + primo secondario."""
+    if not windings:
+        return "MV-MV"
+    if len(windings) == 1:
+        b = windings[0]["base"]
+        return f"{b}-{b}"
+    return f"{windings[0]['base']}-{windings[1]['base']}"
+
+
 def select_image(raw, family, schema):
-    """Return image key from rules, or None if ambiguous (then ask in form)."""
-    rules = schema["image_rules"]
-    if family == "resina":
-        cab = raw.get("Cabina")
-        if not is_blank(cab):
-            truthy = str(cab).strip().lower() in ("si", "sì", "yes", "y", "true", "1", "x")
-            return rules["resina"]["cabina_true" if truthy else "cabina_false"]
-        return rules["resina"]["cabina_false"]  # default resin_open, sovrascrivibile nel form
-    casa = str(raw.get("Tipo casa") or "").strip()
-    branch = rules["olio"].get(casa)
-    if isinstance(branch, str):
-        return branch
-    if isinstance(branch, dict):
-        cooling_sys = str(raw.get("Tipo sistema raffreddamento") or "").strip()
-        return branch.get(cooling_sys)  # may be None -> ambiguous
-    return None
+    """Compone il nome file dai dati; ricade sui generici / fallback se la combo
+    esatta non esiste tra le immagini. Restituisce la chiave (senza .png)."""
+    windings = build_windings(raw, schema)
+    earthing = is_earthing(raw)
+    casa = str(raw.get("Tipo casa") or "").strip().lower()
+    cooling = str(raw.get("Tipo sistema raffreddamento") or "").strip().lower()
+    oltc = "sottocarico" in str(raw.get("Tipo commutatore") or "").lower()
+
+    cand = []
+    if earthing:
+        if family == "resina":
+            cand.append("Earthing_resina")
+        else:
+            cassa = "ermetico" if "ermetico" in casa else "conservatore"
+            has_bt = any(w["base"] == "LV" for w in windings[1:])  # secondario in bassa tensione
+            if has_bt:
+                cand.append(f"Earthing_{cassa}_avvolgimento_BT")
+            cand.append(f"Earthing_{cassa}")
+        cand.append("Earthing_resina")
+    elif family == "resina":
+        cand.append("Trasformatore_resina")
+    else:  # olio
+        if "conservatore" in casa and "radiatori" in cooling:
+            sig = _winding_pair(windings)
+            comm = "OLTC" if oltc else "a_vuoto"
+            cand.append(f"Conservatore_radiatori_{sig}_commutatore_{comm}")
+            cand.append("Conservatore_radiatori_MV-MV_commutatore_a_vuoto")  # fallback casi speciali
+        elif "conservatore" in casa:
+            cand.append("Conservatore_onde")
+        elif "ermetico" in casa:
+            cand.append("Ermetico_onde")
+        cand.append("Conservatore_onde")  # fallback generico olio
+
+    for c in cand:
+        if _img_exists(c):
+            return c
+    return cand[0] if cand else None
 
 
 def translate(label, raw_value, schema):
@@ -147,14 +186,14 @@ WINDINGS = [
              "wt": "Tipo avvolg. BT2", "tc": "Classe termica BT2", "tr": "Sovratemperatura avvolg. BT2"}),
 ]
 WINDING_ROWS = [
-    ("Rated power", "P", "kVA"),
-    ("Voltage", "V", "V"),
-    ("Connection", "conn", None),
-    ("Insulation level", "ins", "kV"),
-    ("Winding material", "mat", None),
-    ("Winding type", "wt", None),
-    ("Thermal class", "tc", None),
-    ("Winding temp. rise", "tr", "°C"),
+    ("Rated power", "P", "kVA", 0),
+    ("Voltage", "V", "V", 0),
+    ("Connection", "conn", None, None),
+    ("Insulation level", "ins", "kV", None),
+    ("Winding material", "mat", None, None),
+    ("Winding type", "wt", None, None),
+    ("Thermal class", "tc", None, None),
+    ("Winding temp. rise", "tr", "°C", 0),
 ]
 IMPEDANCES = [
     ("Impedenza di cortocircuito % MT-BT1", "MT", "BT1"),
@@ -225,11 +264,15 @@ def build_ratings(raw, schema):
     rolelabel = {w["role"]: w["label"] for w in windings}
 
     rows = []
-    for en, key, unit in WINDING_ROWS:
+    for en, key, unit, dec in WINDING_ROWS:
         cells = []
         for w in windings:
             m = w["m"]
-            val = get_display(m[key], raw, schema)
+            raw_v = raw.get(m[key])
+            if dec is not None and isinstance(raw_v, (int, float)) and not isinstance(raw_v, bool):
+                val = format_value(raw_v, {"decimals": dec}, nf)
+            else:
+                val = get_display(m[key], raw, schema)
             if key == "V" and w["role"] == "MT":            # doppia tensione MT: min / max
                 v1, v2 = _f(raw.get(m["V"])), _f(raw.get(m.get("V2")))
                 if v1 and v2 and v2 != 0:
@@ -312,6 +355,67 @@ def cesi_text(raw, family):
     return f"{str(cls).replace(' ', '')} type test nr. B4013916"
 
 
+UM_THRESHOLD = 72.5  # kV, soglia prove aggiuntive
+
+
+def _um_kv(raw):
+    """Um in kV = primo numero della classe isolamento MT ('24 / 50 / 125' -> 24)."""
+    v = raw.get("Classe isolamento MT")
+    if is_blank(v):
+        return None
+    first = str(v).split("/")[0].strip().replace(",", ".")
+    try:
+        return float(first)
+    except ValueError:
+        return None  # es. cella corrotta in data: soglia non valutabile -> nessuna prova HV
+
+
+def is_earthing(raw):
+    return str(raw.get("Gruppo vettoriale") or "").strip().upper().startswith("Z")
+
+
+def build_tests(raw, family, earthing_override=None):
+    """Prove di routine IEC 60076-1 secondo le casistiche (dal foglio 'Principale').
+    Prove interne (SFERA/DFR/insulation resistance/core demag) escluse per scelta."""
+    um = _um_kv(raw)
+    hv = um is not None and um > UM_THRESHOLD
+    oil = family == "olio"
+    earth = is_earthing(raw) if earthing_override is None else earthing_override
+    oltc = "sottocarico" in str(raw.get("Tipo commutatore") or "").lower()
+    note_e = " — only for earthing transformer with secondary winding" if earth else ""
+
+    t = [
+        "Measurement of winding resistance",
+        "Measurement of voltage ratio and check of phase displacement" + note_e,
+        "Measurement of short-circuit impedance and load loss" + note_e,
+        "Measurement of no-load loss and current",
+        "Dielectric routine tests:",
+        "– Applied voltage test (AV)",
+        "– " + ("Induced voltage test with PD measurement (IVPD)" if hv
+                else "Induced voltage withstand test (IVW)"),
+        "– Auxiliary wiring insulation test (AuxW) — only if present",
+    ]
+    if hv:
+        t.append("– Full wave lightning impulse test for the line terminals (LI)")
+        t.append("– Line terminal AC withstand voltage test (LTAC) — only for non-uniform insulation")
+    if oltc:
+        t.append("Tests on on-load tap-changers, where appropriate")
+    if oil:
+        t.append("Leak testing with pressure for liquid-immersed transformers (tightness test)")
+    t.append("Check of the ratio and polarity of built-in current transformers — only if present")
+    t.append("Check of core and frame insulation for liquid immersed transformers with core or frame insulation")
+    if earth:
+        t.append("Measurement of zero-sequence impedance")
+    if hv:
+        t.append("Additional routine tests (Um > 72.5 kV):")
+        t.append("– Determination of capacitances windings-to-earth and between windings")
+        t.append("– Measurement of d.c. insulation resistance between each winding to earth and between windings")
+        t.append("– Measurement of dissipation factor (tan δ) of the insulation system capacitances")
+        t.append("– Measurement of dissolved gases in dielectric liquid from each oil compartment")
+        t.append("– Measurement of no-load loss and current at 90 % and 110 % of rated voltage")
+    return t
+
+
 def designation(raw, schema):
     nf = schema["meta"]["number_format"]
     serie = str(raw.get("Serie") or "").strip()
@@ -372,6 +476,7 @@ def parse(xlsx_path, schema=None, overrides=None):
         "sections": grouped_sections(fields),
         "ratings": build_ratings(raw, schema),
         "cesi": cesi_text(raw, family),
+        "tests": build_tests(raw, family, ov.get("__earthing__")),
         "accessories_excel": accessories,
         "dims": {
             "L": raw.get("Lunghezza trafo"),

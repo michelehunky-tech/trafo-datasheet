@@ -57,6 +57,7 @@ def main():
         st.session_state.pop("answers", None)
         st.session_state.pop("omitted", None)
         st.session_state.pop("acc_text", None)
+        st.session_state.pop("tests_text", None)
 
     # portal meta inputs
     st.subheader("Dati commessa")
@@ -124,13 +125,16 @@ def main():
         return
 
     # ---------- image selector with thumbnail ----------
-    IMAGES = ["oil_conservator_radiators", "oil_conservator_corrugated",
-              "oil_hermetic", "resin_enclosure", "resin_open"]
+    tdir = os.path.join(os.path.dirname(__file__), "assets", "transformers")
+    OLD = {"oil_conservator_radiators", "oil_conservator_corrugated",
+           "oil_hermetic", "resin_enclosure", "resin_open"}
+    IMAGES = sorted(f[:-4] for f in os.listdir(tdir)
+                    if f.endswith(".png") and f[:-4] not in OLD)
     st.subheader("Immagine trasformatore")
-    cur = parsed["image_key"] or "resin_open"
-    chosen = st.selectbox("Immagine", IMAGES,
-                          index=IMAGES.index(cur) if cur in IMAGES else 0)
-    img_path = os.path.join(os.path.dirname(__file__), "assets", "transformers", f"{chosen}.png")
+    cur = parsed["image_key"]
+    idx = IMAGES.index(cur) if cur in IMAGES else 0
+    chosen = st.selectbox("Immagine", IMAGES, index=idx)
+    img_path = os.path.join(tdir, f"{chosen}.png")
     if os.path.exists(img_path):
         st.image(img_path, width=260, caption=chosen)
     if chosen != parsed["image_key"]:
@@ -152,26 +156,17 @@ def main():
     acc_text = st.text_area("Accessori (uno per riga)", height=220, key="acc_text")
     accessories = [l.strip() for l in acc_text.split("\n") if l.strip()]
 
-    # tests & certifications (solo layout Moderno)
-    st.subheader("Tests & Certifications")
-    certs = st.session_state.setdefault("certs", [])
-    if certs:
-        h1, h2, _ = st.columns([3, 3, 1])
-        h1.caption("Test / Certification"); h2.caption("Detail")
-    for i, row in enumerate(certs):
-        c1, c2, c3 = st.columns([3, 3, 1])
-        row["name"] = c1.text_input("Test", row.get("name", ""), key=f"cert_n_{i}", label_visibility="collapsed")
-        row["spec"] = c2.text_input("Detail", row.get("spec", ""), key=f"cert_s_{i}", label_visibility="collapsed")
-        if c3.button("✕", key=f"cert_d_{i}"):
-            certs.pop(i); st.rerun()
-    if st.button("+ Aggiungi test / certificazione"):
-        certs.append({"name": "", "spec": ""}); st.rerun()
-    certifications = [c for c in certs if (c.get("name") or "").strip()]
+    # routine tests: derivati dalle regole IEC, precompilati, modificabili
+    st.subheader("Routine tests (IEC 60076-1)")
+    if "tests_text" not in st.session_state:
+        st.session_state["tests_text"] = "\n".join(parsed.get("tests", []))
+    tests_text = st.text_area("Prove (una per riga)", height=260, key="tests_text")
+    tests = [l.strip() for l in tests_text.split("\n") if l.strip()]
 
     notes = st.text_area("Notes (facoltative)", st.session_state.get("notes", ""))
     if st.button("Genera PDF", type="primary"):
         out = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
-        render_pdf_modern(parsed, meta, notes, out.name, accessories=accessories, certifications=certifications)
+        render_pdf_modern(parsed, meta, notes, out.name, accessories=accessories, tests=tests)
         with open(out.name, "rb") as f:
             st.download_button("Scarica la scheda tecnica (PDF)", f.read(),
                                file_name=f"datasheet_{(meta['client'] or 'trafo').replace(' ', '_')}.pdf",
