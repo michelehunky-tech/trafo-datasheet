@@ -67,7 +67,7 @@ def render_pdf(parsed, meta, notes, out_path, accessories=None):
     return out_path
 
 
-def render_pdf_modern(parsed, meta, notes, out_path, accessories=None, certifications=None):
+def render_pdf_modern(parsed, meta, notes, out_path, accessories=None, tests=None):
     """Alternative layout: Space Grotesk, centered hero figure, numbered sections."""
     from parser.extract import designation_parts, load_schema
     env = Environment(loader=FileSystemLoader(str(RENDER_DIR)),
@@ -75,6 +75,10 @@ def render_pdf_modern(parsed, meta, notes, out_path, accessories=None, certifica
     tpl = env.get_template("template_modern.html")
     figure_svg = build_figure_svg(parsed["image_key"], parsed["dims"]) if parsed["image_key"] else ""
     main, voltage, serie = designation_parts(parsed["raw"], load_schema())
+    acc = accessories if accessories is not None else parsed.get("accessories_excel", [])
+    acc = [a for a in acc if str(a).strip()]
+    tst = tests if tests is not None else parsed.get("tests", [])
+    tst = [t for t in tst if str(t).strip()]
     html = tpl.render(
         designation_main=main,
         designation_voltage=voltage,
@@ -83,9 +87,9 @@ def render_pdf_modern(parsed, meta, notes, out_path, accessories=None, certifica
         sections={s["key"]: s for s in parsed["sections"]},
         ratings=parsed["ratings"],
         figure_svg=figure_svg,
-        show_cesi=(parsed["family"] == "resina"),
-        accessories=[a for a in (accessories or []) if (a.get("name") or "").strip()],
-        certifications=[c for c in (certifications or []) if (c.get("name") or "").strip()],
+        cesi=parsed.get("cesi"),
+        accessories=acc,
+        tests=tst,
         notes=notes,
     )
     HTML(string=html, base_url=str(ROOT)).write_pdf(out_path)
