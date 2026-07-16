@@ -1,0 +1,282 @@
+/* ============================================================
+   TRAFO ELETTRO — DATASHEET APP
+   Light/dark theme + brand accents. Font: Space Grotesk for
+   headlines and emphasis; system sans for dense text.
+   ============================================================ */
+:root, [data-theme="light"]{
+  --bg: #F7F7F8;
+  --panel: #FFFFFF;
+  --ink: #14151A;
+  --ink-soft: #6B6D72;
+  --line: #E4E5E8;
+  --accent: #FFD000;
+  --accent-ink: #14151A;
+  --stripe: rgba(20,21,26,0.025);
+  --shadow: 0 10px 40px -12px rgba(20,21,26,0.15), 0 2px 8px -2px rgba(20,21,26,0.05);
+}
+[data-theme="dark"]{
+  --bg: #0E0F13;
+  --panel: #171921;
+  --ink: #F1F2F5;
+  --ink-soft: #9AA0AA;
+  --line: #2A2D36;
+  --accent: #FFD000;
+  --accent-ink: #14151A;
+  --stripe: rgba(255,255,255,0.02);
+  --shadow: 0 10px 40px -12px rgba(0,0,0,0.6), 0 2px 8px -2px rgba(0,0,0,0.3);
+}
+
+/* diagonal stripes background */
+html, body, [data-testid="stAppViewContainer"]{
+  background:
+    repeating-linear-gradient(135deg, transparent 0 20px, var(--stripe) 20px 21px),
+    linear-gradient(180deg, var(--bg) 0%, var(--panel) 100%) !important;
+  color: var(--ink) !important;
+  transition: background 0.4s ease, color 0.4s ease;
+}
+
+/* nascondi header/menu default di Streamlit */
+[data-testid="stHeader"], [data-testid="stToolbar"], footer{ display:none !important; }
+#MainMenu{ visibility:hidden; }
+
+/* colonna centrale più stretta */
+.block-container{
+  max-width: 960px !important;
+  padding-top: 1.5rem !important;
+  padding-bottom: 5rem !important;
+}
+
+/* fonts: Grotesk su titoli, sistema per il resto */
+h1, h2, h3, .te-title, .te-eyebrow, .te-secnum, .te-sechead h2, .te-btn, .te-badge{
+  font-family: "Space Grotesk", -apple-system, "Segoe UI", Arial, sans-serif !important;
+  letter-spacing: -0.01em;
+}
+
+/* ============================================================
+   LOGIN GATE
+   ============================================================ */
+.te-gate{
+  min-height: 70vh;
+  display:flex; align-items:center; justify-content:center;
+  animation: teFadeUp 0.5s ease both;
+}
+.te-card{
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 40px 44px 32px;
+  width: 100%; max-width: 420px;
+  text-align: center;
+  animation: teFadeUp 0.5s ease both;
+}
+.te-card .logo{ display:block; margin: 0 auto 20px; width:auto; max-width:200px; height:auto; }
+.te-card h1{ font-size: 22pt; font-weight: 700; margin: 4px 0 6px; color: var(--ink); }
+.te-card .sub{ color: var(--ink-soft); font-size: 10pt; margin: 0 0 24px; }
+
+/* input password in gate */
+.te-gate [data-testid="stTextInput"] input{
+  background: var(--bg);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 11pt;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.te-gate [data-testid="stTextInput"] input:focus{
+  border-color: var(--ink);
+  box-shadow: 0 0 0 3px rgba(255,208,0,0.25);
+  outline: none;
+}
+
+/* pulsante Enter nero -> giallo hover */
+.te-gate [data-testid="stButton"] button{
+  background: var(--ink) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 10px !important;
+  padding: 12px 22px !important;
+  font-weight: 600 !important;
+  width: 100%;
+  transition: background 0.2s, transform 0.08s, box-shadow 0.2s !important;
+  box-shadow: 0 4px 14px -6px rgba(0,0,0,0.3);
+}
+.te-gate [data-testid="stButton"] button:hover{
+  background: var(--accent) !important;
+  color: var(--accent-ink) !important;
+  transform: translateY(-1px);
+}
+.te-gate [data-testid="stButton"] button:active{ transform: translateY(0); }
+
+/* ============================================================
+   APP HEADER (dentro il flusso, non fixed)
+   ============================================================ */
+.te-header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 6px 12px 14px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 22px;
+  animation: teFadeUp 0.4s ease both;
+}
+.te-header .brand img{ height: 30px; width:auto; display:block; }
+.te-header .toggle{
+  display:flex; align-items:center; gap:8px;
+  font-size: 8pt; font-weight:600; text-transform: uppercase;
+  letter-spacing: .12em; color: var(--ink-soft);
+}
+
+/* i widget Streamlit dentro l'header (toggle) */
+.te-header [data-testid="stToggle"] label{ display:none !important; }
+
+/* ============================================================
+   SEZIONI
+   ============================================================ */
+.te-section{
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin: 14px 0;
+  box-shadow: var(--shadow);
+  animation: teFadeUp 0.4s ease both;
+  transition: background 0.3s, border-color 0.3s;
+}
+.te-sechead{
+  display:flex; align-items:center; gap:10px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--line);
+  margin-bottom: 14px;
+}
+.te-secnum{
+  background: var(--ink); color: var(--accent);
+  width: 22px; height: 22px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 10pt; flex: none;
+}
+.te-sechead h2{ margin: 0; font-size: 14pt; font-weight: 700; color: var(--ink); }
+
+/* riepilogo tabellare */
+.te-table{ width:100%; border-collapse: collapse; font-size: 10pt; }
+.te-table tr:nth-child(even){ background: rgba(0,0,0,0.02); }
+[data-theme="dark"] .te-table tr:nth-child(even){ background: rgba(255,255,255,0.03); }
+.te-table td{ padding: 7px 10px; border-bottom: 1px solid var(--line); }
+.te-table td.k{ color: var(--ink-soft); width: 55%; }
+.te-table td.v{ font-weight: 600; color: var(--ink); }
+.te-table th{ text-align:left; font-size: 7.5pt; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--ink-soft); padding: 6px 10px; border-bottom: 1.5px solid var(--line); font-weight: 600; }
+
+/* Streamlit expander -> stessa estetica */
+[data-testid="stExpander"]{
+  background: var(--panel) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 10px !important;
+  margin-bottom: 8px !important;
+  overflow: hidden;
+  transition: transform 0.15s, box-shadow 0.2s, border-color 0.2s;
+}
+[data-testid="stExpander"]:hover{ border-color: var(--ink-soft) !important; box-shadow: var(--shadow); }
+[data-testid="stExpander"] summary{ padding: 10px 14px !important; color: var(--ink) !important; font-weight: 600; }
+[data-testid="stExpander"] summary:hover{ color: var(--ink) !important; }
+
+/* immagine trasformatore preview */
+[data-testid="stImage"] img{
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  background: #fff;   /* le PNG dei trasformatori sono su bianco */
+}
+
+/* input generici */
+[data-testid="stTextInput"] input,
+[data-testid="stTextArea"] textarea,
+[data-testid="stSelectbox"] div[data-baseweb="select"] > div{
+  background: var(--panel) !important;
+  border: 1px solid var(--line) !important;
+  color: var(--ink) !important;
+  border-radius: 8px !important;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+[data-testid="stTextInput"] input:focus,
+[data-testid="stTextArea"] textarea:focus{
+  border-color: var(--ink) !important;
+  box-shadow: 0 0 0 3px rgba(255,208,0,0.25) !important;
+}
+
+/* label dei widget */
+[data-testid="stWidgetLabel"] p{
+  color: var(--ink-soft) !important;
+  font-size: 8pt !important;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+/* pulsanti secondari */
+[data-testid="stButton"] button{
+  background: var(--panel) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  transition: all 0.15s !important;
+}
+[data-testid="stButton"] button:hover{
+  border-color: var(--ink) !important;
+  transform: translateY(-1px);
+}
+
+/* pulsante PRIMARY = giallo brand */
+[data-testid="stButton"] button[kind="primary"],
+[data-testid="baseButton-primary"]{
+  background: var(--accent) !important;
+  color: var(--accent-ink) !important;
+  border: none !important;
+  padding: 12px 24px !important;
+  font-size: 11pt !important;
+  border-radius: 10px !important;
+  box-shadow: 0 6px 20px -8px rgba(255,208,0,0.6) !important;
+}
+[data-testid="stButton"] button[kind="primary"]:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px -8px rgba(255,208,0,0.7) !important;
+}
+[data-testid="stButton"] button[kind="primary"]:active{ transform: translateY(0); }
+
+/* download button */
+[data-testid="stDownloadButton"] button{
+  background: var(--ink) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 10px !important;
+  padding: 12px 24px !important;
+  font-weight: 600 !important;
+  transition: all 0.15s !important;
+}
+[data-testid="stDownloadButton"] button:hover{
+  background: var(--accent) !important;
+  color: var(--accent-ink) !important;
+  transform: translateY(-1px);
+}
+
+/* divider default streamlit */
+hr{ border-color: var(--line) !important; opacity: .6; }
+
+/* animation */
+@keyframes teFadeUp{
+  from{ opacity: 0; transform: translateY(8px); }
+  to{ opacity: 1; transform: translateY(0); }
+}
+
+/* piccoli aggiustamenti */
+[data-testid="stCaptionContainer"]{ color: var(--ink-soft) !important; }
+h1, h2, h3{ color: var(--ink) !important; }
+p, div, span, li{ color: var(--ink); }
+[data-testid="stMarkdownContainer"] p{ color: var(--ink); }
+
+/* badge famiglia/immagine */
+.te-pill{
+  display:inline-block; padding: 3px 10px; border-radius: 20px;
+  background: rgba(255,208,0,0.15); color: var(--ink);
+  font-size: 8pt; font-weight: 600; margin-right: 6px;
+  border: 1px solid rgba(255,208,0,0.4);
+}

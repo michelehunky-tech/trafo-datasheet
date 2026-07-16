@@ -45,9 +45,10 @@
     {% if meta.offer %}<span class="badge">Offer {{ meta.offer }}{% if meta.revision %} rev.{{ meta.revision }}{% endif %}</span>{% endif %}
   </td>
   <td class="herologos">
-    <img class="dnv" src="assets/dnv_iso.png">
-    {% if cesi %}<img class="cesilogo" src="assets/cesi.png">
-    <div class="cesicap">{{ cesi }}</div>{% endif %}
+    <span class="stack">
+      <img class="dnv" src="assets/dnv_iso.png">
+      {% if cesi %}<span class="cesibox"><img class="cesilogo" src="assets/cesi.png"><span class="cesicap">{{ cesi }}</span></span>{% endif %}
+    </span>
   </td>
 </tr></table>
 

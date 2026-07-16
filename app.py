@@ -5,8 +5,10 @@ Flow: password gate -> upload Excel -> parse -> validate -> dynamic form
 No database, no storage, no email. No LLM at runtime.
 """
 import os
+import base64
 import tempfile
 from datetime import date
+from pathlib import Path
 
 import streamlit as st
 
@@ -15,21 +17,79 @@ from parser.validate import validate
 from render.pdf import render_pdf_modern
 
 OMIT = "__OMIT__"
-st.set_page_config(page_title="Trafo Elettro · Datasheet", layout="centered")
+ASSETS = Path(__file__).with_name("assets")
+st.set_page_config(page_title="Trafo Elettro · Datasheet",
+                   page_icon=str(ASSETS / "logo.png") if (ASSETS / "logo.png").exists() else None,
+                   layout="centered")
+
+
+def _b64(path):
+    try:
+        return base64.b64encode(Path(path).read_bytes()).decode("ascii")
+    except Exception:
+        return ""
+
+
+def inject_style():
+    """Inietta il CSS globale + data-theme sul root."""
+    theme = st.session_state.get("theme", "light")
+    css = (ASSETS / "app_style.css").read_text() if (ASSETS / "app_style.css").exists() else ""
+    st.markdown(
+        f"<style>{css}</style>"
+        f"<script>document.documentElement.setAttribute('data-theme','{theme}');</script>",
+        unsafe_allow_html=True,
+    )
+
+
+def logo_img_tag(cls="logo", height=None):
+    b = _b64(ASSETS / "logo.png")
+    if not b:
+        return ""
+    style = f' style="height:{height}"' if height else ""
+    return f'<img class="{cls}" src="data:image/png;base64,{b}"{style}>'
+
+
+def header():
+    """Header interno: logo a sinistra, toggle tema a destra."""
+    st.markdown(f'<div class="te-header"><div class="brand">{logo_img_tag(height="34px")}</div>'
+                f'<div class="toggle" id="te-toggle-anchor"></div></div>',
+                unsafe_allow_html=True)
+    cols = st.columns([6, 1])
+    with cols[1]:
+        current = st.session_state.get("theme", "light")
+        dark = st.toggle("Dark", value=(current == "dark"), key="__theme_toggle",
+                         label_visibility="collapsed")
+        new = "dark" if dark else "light"
+        if new != current:
+            st.session_state["theme"] = new
+            st.rerun()
 
 
 # ---------- auth ----------
 def gate():
+    inject_style()
     if st.session_state.get("auth"):
         return True
-    st.title("Trafo Elettro · Technical Datasheet")
-    pw = st.text_input("Password", type="password")
-    if st.button("Enter"):
-        if pw and pw == os.environ.get("APP_PASSWORD", ""):
-            st.session_state["auth"] = True
-            st.rerun()
-        else:
-            st.error("Wrong password.")
+    st.markdown(
+        f'<div class="te-gate"><div class="te-card">'
+        f'{logo_img_tag("logo")}'
+        f'<h1>Technical Datasheet</h1>'
+        f'<p class="sub">Enter password to continue</p>'
+        f'</div></div>',
+        unsafe_allow_html=True,
+    )
+    # widget dentro il flusso normale, ma stilati dal CSS del gate
+    with st.container():
+        st.markdown('<div class="te-gate-form">', unsafe_allow_html=True)
+        pw = st.text_input("Password", type="password", label_visibility="collapsed",
+                           placeholder="Password")
+        if st.button("Enter", use_container_width=True):
+            if pw and pw == os.environ.get("APP_PASSWORD", ""):
+                st.session_state["auth"] = True
+                st.rerun()
+            else:
+                st.error("Wrong password.")
+        st.markdown('</div>', unsafe_allow_html=True)
     return False
 
 
@@ -39,9 +99,13 @@ def reset():
 
 
 def main():
+    inject_style()
+    header()
     schema = load_schema()
-    st.title("Technical Datasheet")
-    st.caption("Carica l'Excel di estrazione, completa gli eventuali campi mancanti, genera il PDF.")
+    st.markdown('<h1 style="margin:0 0 6px;">Technical Datasheet</h1>'
+                '<p style="color:var(--ink-soft);margin:0 0 22px;">'
+                'Carica l\'Excel di estrazione, completa gli eventuali campi mancanti, genera il PDF.</p>',
+                unsafe_allow_html=True)
 
     up = st.file_uploader("Excel di estrazione (.xlsx)", type=["xlsx"])
     if up is None:

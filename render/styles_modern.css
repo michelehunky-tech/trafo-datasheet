@@ -39,11 +39,16 @@ body{margin:0;}
 
 /* ---- hero block: big title, code badge, no diagonal motif ---- */
 .herowrap{width:100%; border-collapse:collapse; margin-top:8px;}
-.herowrap td{vertical-align:top; padding:0;}
-.herowrap .herotitle{width:74%;}
-.herowrap .herologos{width:26%; text-align:right; white-space:nowrap; vertical-align:top; padding-top:4px;}
-.herowrap .herologos img{height:17mm; width:auto; vertical-align:top; margin-left:8px;}
-.herowrap .cesicap{font-size:6pt; color:var(--ink-soft); margin-top:3px; line-height:1.3;}
+.herowrap td{padding:0;}
+.herowrap .herotitle{vertical-align:middle;}
+.herowrap .herologos{width:32%; text-align:right; white-space:nowrap; vertical-align:top;}
+.herowrap .herologos .stack{margin-top:-16mm; display:inline-block;}
+.herowrap .herologos img{width:auto; vertical-align:middle; margin-left:10px;}
+.herowrap .herologos .dnv{height:20mm;}
+.herowrap .herologos .cesilogo{height:11mm;}
+.herowrap .herologos .cesibox{display:inline-block; vertical-align:middle; margin-left:10px; text-align:left;}
+.herowrap .herologos .cesibox .cesilogo{margin-left:0; display:block;}
+.herowrap .cesicap{display:block; font-size:6pt; color:var(--ink-soft); margin-top:3px; line-height:1.3;}
 .herotitle h1{font-size:34pt; font-weight:700; letter-spacing:-0.02em; line-height:1; margin:0;}
 .herotitle .sub{font-size:20pt; font-weight:500; color:var(--ink); margin-top:4px; letter-spacing:-0.01em;}
 .badge{display:inline-block; background:var(--accent); color:var(--ink); font-weight:700;
