@@ -280,3 +280,25 @@ p, div, span, li{ color: var(--ink); }
   font-size: 8pt; font-weight: 600; margin-right: 6px;
   border: 1px solid rgba(255,208,0,0.4);
 }
+
+/* ============================================================
+   HEADER + THEME BUTTONS (sole/luna)
+   ============================================================ */
+.te-brand img{ height: 34px; width:auto; display:block; }
+.te-header-row{ animation: teFadeUp 0.4s ease both; }
+
+/* i due bottoni tema: piccoli, icone grandi */
+[data-testid="stButton"] button[data-testid*="theme"],
+button[key="__theme_light"],
+button[key="__theme_dark"]{
+  padding: 6px 0 !important;
+  font-size: 16pt !important;
+  line-height: 1 !important;
+  min-height: 40px;
+}
+
+/* i due bottoni sono in colonne strette; li ridimensiono */
+div[data-testid="column"]:has(button[key="__theme_light"]),
+div[data-testid="column"]:has(button[key="__theme_dark"]){
+  padding: 0 3px !important;
+}

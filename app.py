@@ -50,19 +50,33 @@ def logo_img_tag(cls="logo", height=None):
 
 
 def header():
-    """Header interno: logo a sinistra, toggle tema a destra."""
-    st.markdown(f'<div class="te-header"><div class="brand">{logo_img_tag(height="34px")}</div>'
-                f'<div class="toggle" id="te-toggle-anchor"></div></div>',
+    """Header interno: logo a sinistra, toggle tema (sole/luna) a destra."""
+    current = st.session_state.get("theme", "light")
+    st.markdown('<div class="te-header-row">', unsafe_allow_html=True)
+    left, right = st.columns([5, 2])
+    with left:
+        st.markdown(f'<div class="te-brand">{logo_img_tag(height="34px")}</div>',
+                    unsafe_allow_html=True)
+    with right:
+        c1, c2 = st.columns(2)
+        with c1:
+            if st.button("☀", key="__theme_light",
+                         help="Tema chiaro",
+                         use_container_width=True,
+                         type=("primary" if current == "light" else "secondary")):
+                if current != "light":
+                    st.session_state["theme"] = "light"
+                    st.rerun()
+        with c2:
+            if st.button("🌙", key="__theme_dark",
+                         help="Tema scuro",
+                         use_container_width=True,
+                         type=("primary" if current == "dark" else "secondary")):
+                if current != "dark":
+                    st.session_state["theme"] = "dark"
+                    st.rerun()
+    st.markdown('</div><hr style="margin:0 0 18px;border:none;border-top:1px solid var(--line);">',
                 unsafe_allow_html=True)
-    cols = st.columns([6, 1])
-    with cols[1]:
-        current = st.session_state.get("theme", "light")
-        dark = st.toggle("Dark", value=(current == "dark"), key="__theme_toggle",
-                         label_visibility="collapsed")
-        new = "dark" if dark else "light"
-        if new != current:
-            st.session_state["theme"] = new
-            st.rerun()
 
 
 # ---------- auth ----------
@@ -221,18 +235,21 @@ def main():
             for r in s["rows"]:
                 st.write(f"- {r['en']}: **{r['value']}**" + (f" {r['unit']}" if r["unit"] else ""))
 
-    # accessories: precompilati dall'Excel, uno per riga, modificabili
+    # accessories: precompilati dall'Excel al primo caricamento del file, poi editabili
+    uploaded_id = st.session_state.get("uploaded")
     st.subheader("Accessories")
-    if "acc_text" not in st.session_state:
-        st.session_state["acc_text"] = "\n".join(parsed.get("accessories_excel", []))
-    acc_text = st.text_area("Accessori (uno per riga)", height=220, key="acc_text")
+    acc_key = f"acc_text::{uploaded_id}"
+    if acc_key not in st.session_state:
+        st.session_state[acc_key] = "\n".join(parsed.get("accessories_excel", []))
+    acc_text = st.text_area("Accessori (uno per riga)", height=220, key=acc_key)
     accessories = [l.strip() for l in acc_text.split("\n") if l.strip()]
 
     # routine tests: derivati dalle regole IEC, precompilati, modificabili
     st.subheader("Routine tests (IEC 60076-1)")
-    if "tests_text" not in st.session_state:
-        st.session_state["tests_text"] = "\n".join(parsed.get("tests", []))
-    tests_text = st.text_area("Prove (una per riga)", height=260, key="tests_text")
+    tests_key = f"tests_text::{uploaded_id}"
+    if tests_key not in st.session_state:
+        st.session_state[tests_key] = "\n".join(parsed.get("tests", []))
+    tests_text = st.text_area("Prove (una per riga)", height=260, key=tests_key)
     tests = [l.strip() for l in tests_text.split("\n") if l.strip()]
 
     notes = st.text_area("Notes (facoltative)", st.session_state.get("notes", ""))
