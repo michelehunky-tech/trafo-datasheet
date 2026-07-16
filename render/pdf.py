@@ -18,35 +18,14 @@ def _fmt(v):
 
 
 def build_figure_svg(image_key, dims):
-    """Return inline SVG: image + 3 axis-parallel dimension lines (no arrows)
-    with measures. Falls back to image + caption when no calibration exists."""
+    """Immagine + misure L×W×H con label e icona cartesiano. Nessuna quota sul disegno."""
     rel = f"assets/transformers/{image_key}.png"
-    cal = ANCHORS.get(image_key)
-    if not cal:
-        return (f'<img class="figimg" src="{rel}">'
-                f'<div class="dimcap"><span class="lbl">Overall L × W × H</span>'
-                f'{_fmt(dims["L"])} × {_fmt(dims["W"])} × {_fmt(dims["H"])} mm</div>')
-
-    w, h = cal["image"]["w"], cal["image"]["h"]
-    lines, labels = [], []
-    for axis, value in (("L", dims["L"]), ("W", dims["W"]), ("H", dims["H"])):
-        a = cal[axis]
-        sx, sy = a["start"]
-        ex = sx + a["dir"][0] * a["length"]
-        ey = sy + a["dir"][1] * a["length"]
-        mx, my = (sx + ex) / 2, (sy + ey) / 2
-        lines.append(f'<line x1="{sx:.0f}" y1="{sy:.0f}" x2="{ex:.0f}" y2="{ey:.0f}"/>')
-        labels.append(
-            f'<g transform="translate({mx:.0f},{my:.0f}) rotate({a["rot"]})">'
-            f'<rect x="-64" y="-16" width="128" height="29" rx="2" fill="#fff"/>'
-            f'<text x="0" y="5" text-anchor="middle">{axis} {_fmt(value)} mm</text></g>')
-    return (
-        f'<svg class="figsvg" viewBox="{cal["viewbox"]}" xmlns="http://www.w3.org/2000/svg" '
-        f'xmlns:xlink="http://www.w3.org/1999/xlink">'
-        f'<image href="{rel}" x="0" y="0" width="{w}" height="{h}"/>'
-        f'<g stroke="#1D1E1B" stroke-width="2.4" stroke-linecap="round" fill="none">{"".join(lines)}</g>'
-        f'<g font-family="Zalando Sans" font-weight="500" font-size="25" fill="#1D1E1B">{"".join(labels)}</g>'
-        f'</svg>')
+    return (f'<img class="figimg" src="{rel}">'
+            f'<div class="dimcap">'
+            f'<div class="lbl">Overall L × W × H</div>'
+            f'<div class="meas"><img class="axesicon" src="assets/cartesiano.png">'
+            f'<span>{_fmt(dims["L"])} × {_fmt(dims["W"])} × {_fmt(dims["H"])} mm</span></div>'
+            f'</div>')
 
 
 def render_pdf(parsed, meta, notes, out_path, accessories=None):
@@ -88,6 +67,7 @@ def render_pdf_modern(parsed, meta, notes, out_path, accessories=None, tests=Non
         ratings=parsed["ratings"],
         figure_svg=figure_svg,
         cesi=parsed.get("cesi"),
+        standards=parsed.get("standards"),
         accessories=acc,
         tests=tst,
         notes=notes,

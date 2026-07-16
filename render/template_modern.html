@@ -13,7 +13,7 @@
   {% for r in sec.rows %}
     <td style="width:33.33%">
       <div class="cell">
-        <span class="k">{{ r.en }}</span>
+        <span class="k{% if r.en == 'THDi' %} raw{% endif %}">{{ r.en }}</span>
         <span class="v">{{ r.value }}{% if r.unit %} <span class="u">{{ r.unit }}</span>{% endif %}</span>
       </div>
     </td>
@@ -27,10 +27,7 @@
 <div id="pageHeader">
   <table class="hdr"><tr>
     <td class="logo"><img src="assets/logo.png"></td>
-    <td class="tag">
-      <span class="tagtext">Technical Datasheet</span>
-      <img class="dnv" src="assets/dnv_iso.png">
-    </td>
+    <td class="tag"><span class="tagtext">Technical Datasheet</span></td>
   </tr></table>
 </div>
 
@@ -41,34 +38,36 @@
   </tr></table>
 </div>
 
-<div class="hero">
-  <h1>{{ designation_main }}</h1>
-  <p class="sub">{{ designation_voltage }}{% if designation_series %} &nbsp;—&nbsp; {{ designation_series }}{% endif %}</p>
-  {% if meta.offer %}<span class="badge">Offer {{ meta.offer }}</span>{% endif %}
-</div>
+<table class="herowrap"><tr>
+  <td class="herotitle">
+    <h1>{{ designation_main }}</h1>
+    <p class="sub">{{ designation_voltage }}{% if designation_series %} &nbsp;—&nbsp; {{ designation_series }}{% endif %}</p>
+    {% if meta.offer %}<span class="badge">Offer {{ meta.offer }}{% if meta.revision %} rev.{{ meta.revision }}{% endif %}</span>{% endif %}
+  </td>
+  <td class="herologos">
+    <img class="dnv" src="assets/dnv_iso.png">
+    {% if cesi %}<img class="cesilogo" src="assets/cesi.png">
+    <div class="cesicap">{{ cesi }}</div>{% endif %}
+  </td>
+</tr></table>
 
 <table class="metastrip">
-  <tr>
-    <td colspan="3"><span class="lbl">Project</span><span class="val">{{ meta.project or '—' }}</span></td>
-  </tr>
   <tr>
     <td style="width:40%"><span class="lbl">Client</span><span class="val">{{ meta.client or '—' }}</span></td>
     <td style="width:35%"><span class="lbl">Date</span><span class="val">{{ meta.date or '—' }}</span></td>
     <td style="width:25%"><span class="lbl">Pos.</span><span class="val">{{ meta.pos or '—' }}</span></td>
+  </tr>
+  <tr>
+    <td colspan="3" class="projrow"><span class="lbl">Project</span><span class="val">{{ meta.project or '—' }}</span></td>
   </tr>
 </table>
 
 {% if figure_svg %}
 <div class="herofig">
   <div class="frame">
-    {% if cesi %}
-    <div class="cesi">
-      <img src="assets/cesi.png">
-      <span>{{ cesi }}</span>
-    </div>
-    {% endif %}
     {{ figure_svg|safe }}
   </div>
+  {% if standards %}<p class="complied"><span>Complied with:</span> {{ standards }}</p>{% endif %}
 </div>
 {% endif %}
 
@@ -87,12 +86,6 @@
       {% for c in row.cells %}<td class="val">{{ c }}{% if row.unit and c != '–' %} <span class="u">{{ row.unit }}</span>{% endif %}</td>{% endfor %}
     </tr>
     {% endfor %}
-    {% for imp in ratings.impedances %}
-    <tr><td class="k">{{ imp.label }}</td>
-      <td class="val">{{ imp.value }} <span class="u">{{ imp.unit }}</span></td>
-      {% for i in range(nw - 1) %}<td class="val">–</td>{% endfor %}
-    </tr>
-    {% endfor %}
     {% for t in ratings.taps %}
     <tr><td class="k">{{ t.label }}</td>
       <td class="val">{{ t.value }}</td>
@@ -105,6 +98,7 @@
 
 {{ grid(sections.get('environmental')) }}
 {{ grid(sections.get('dimensions')) }}
+<p class="dimnote">Dimensions, weights and accessories are indicative only. Not for construction.</p>
 
 {% if tests %}
 <div class="section">

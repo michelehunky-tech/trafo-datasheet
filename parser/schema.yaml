@@ -141,7 +141,7 @@ fields:
   include_in_sheet: true
   required: false
 - it: THDi
-  en: Loading application (THDi)
+  en: THDi
   section: general
   family: both
   include_in_sheet: true

@@ -283,22 +283,6 @@ def build_ratings(raw, schema):
         if any(c != "–" for c in cells):
             rows.append({"label": en, "unit": unit, "cells": cells})
 
-    # impedenze: coppie se due secondari, altrimenti valore singolo
-    impedances = []
-    if "BT2" in rolelabel:
-        for key, w1, w2 in IMPEDANCES:
-            if w1 not in rolelabel or w2 not in rolelabel:
-                continue
-            val = _imp(raw.get(key), nf)
-            if val is not None:
-                impedances.append({"label": f"Short-circuit impedance ({rolelabel[w1]}–{rolelabel[w2]})",
-                                   "value": val, "unit": "%"})
-    else:
-        val = (_imp(raw.get("Impedenza di cortocircuito % Totale"), nf)
-               or _imp(raw.get("Impedenza di cortocircuito % MT-BT1"), nf))
-        if val is not None:
-            impedances.append({"label": "Short-circuit impedance", "value": val, "unit": "%"})
-
     # tap changer
     taps = []
     tc = get_display("Tipo commutatore", raw, schema)
@@ -307,7 +291,7 @@ def build_ratings(raw, schema):
     pp, pm = raw.get("Posizioni + rif. MT"), raw.get("Posizioni - rif. MT")
     if not is_blank(pp) or not is_blank(pm):
         taps.append({"label": "Tap positions (+/-)",
-                     "value": f"{int(pp) if not is_blank(pp) else '-'} / {int(pm) if not is_blank(pm) else '-'}"})
+                     "value": f"+{int(pp) if not is_blank(pp) else 0}/-{int(pm) if not is_blank(pm) else 0}"})
     step = raw.get("% gradino rif. MT")
     if not is_blank(step):
         try:
@@ -317,7 +301,54 @@ def build_ratings(raw, schema):
         except (TypeError, ValueError):
             pass
 
-    return {"windings": labels, "rows": rows, "impedances": impedances, "taps": taps}
+    return {"windings": labels, "rows": rows, "taps": taps}
+
+
+def short_circuit_row(raw, schema):
+    """Impedenza cc per Electrical, con etichette coppia:
+    'MV–LV1: 6% / MV–LV2: 6% / LV1–LV2: 3,5%'."""
+    nf = schema["meta"]["number_format"]
+    windings = build_windings(raw, schema)
+    rolelabel = {w["role"]: w["label"] for w in windings}
+    parts = []
+    if "BT2" in rolelabel:
+        for key, w1, w2 in IMPEDANCES:
+            if w1 in rolelabel and w2 in rolelabel:
+                v = _imp(raw.get(key), nf)
+                if v is not None:
+                    parts.append(f"{rolelabel[w1]}–{rolelabel[w2]}: {v}%")
+    else:
+        v = (_imp(raw.get("Impedenza di cortocircuito % Totale"), nf)
+             or _imp(raw.get("Impedenza di cortocircuito % MT-BT1"), nf))
+        if v is not None:
+            if "MT" in rolelabel and "BT1" in rolelabel:
+                parts.append(f"{rolelabel['MT']}–{rolelabel['BT1']}: {v}%")
+            else:
+                parts.append(f"{v}%")
+    if not parts:
+        return None
+    return {"it": None, "en": "Short-circuit impedance", "section": "electrical", "unit": None,
+            "value": " / ".join(parts), "blank": False, "translated_ok": True}
+
+
+def winding_temp_row(raw, schema, windings):
+    """Sovratemperatura avvolgimenti per Working Conditions: valori separati da ' / '."""
+    nf = schema["meta"]["number_format"]
+    vals = []
+    for w in windings:
+        v = raw.get(w["m"]["tr"])
+        if not is_blank(v):
+            vals.append(format_value(v, {"decimals": 0}, nf))
+    if not vals:
+        return None
+    return {"it": None, "en": "Winding temp. rise", "section": "environmental", "unit": "°C",
+            "value": " / ".join(vals), "blank": False, "translated_ok": True}
+
+
+def standards_text(raw):
+    xs = [str(raw.get(f"Norma {i} / Regol. {i}")).strip()
+          for i in range(1, 5) if not is_blank(raw.get(f"Norma {i} / Regol. {i}"))]
+    return " · ".join(xs) if xs else None
 
 
 def efficiency_row(raw, schema):
@@ -333,17 +364,8 @@ def efficiency_row(raw, schema):
     else:
         label = "Efficiency index"
     return {"it": None, "en": label, "section": "electrical", "unit": "%",
-            "value": format_value(val, {"decimals": 2}, schema["meta"]["number_format"]),
+            "value": format_value(val, {"decimals": 3}, schema["meta"]["number_format"]),
             "blank": False, "translated_ok": True}
-
-
-def standards_row(raw):
-    xs = [str(raw.get(f"Norma {i} / Regol. {i}")).strip()
-          for i in range(1, 5) if not is_blank(raw.get(f"Norma {i} / Regol. {i}"))]
-    if not xs:
-        return None
-    return {"it": None, "en": "Standards / Regulations", "section": "general", "unit": None,
-            "value": " · ".join(xs), "blank": False, "translated_ok": True}
 
 
 def cesi_text(raw, family):
@@ -434,16 +456,27 @@ def designation(raw, schema):
 
 
 def designation_parts(raw, schema):
-    """main = potenza (titolone), voltage = MT/BT, series = codice serie."""
+    """main = potenza; voltage = HV / LV con i valori multipli uniti da '-'
+    (es. '10.000-20.000 / 720-400 V'); series = codice serie."""
     nf = schema["meta"]["number_format"]
     serie = str(raw.get("Serie") or "").strip()
     power = raw.get("Potenza nominale MT")
     main = f"{format_value(power, {'decimals':0}, nf)} kVA" if not is_blank(power) else (serie or "Transformer")
-    hv, lv = raw.get("Tensione MT"), raw.get("Tensione BT1")
-    if not is_blank(hv) and not is_blank(lv):
-        voltage = f"{format_value(hv, {'decimals':0}, nf)} / {format_value(lv, {'decimals':0}, nf)} V"
-    elif not is_blank(hv):
-        voltage = f"{format_value(hv, {'decimals':0}, nf)} V"
+
+    def side(keys):
+        vals = []
+        for k in keys:
+            v = raw.get(k)
+            if not is_blank(v) and _f(v) not in (None, 0):
+                vals.append(format_value(v, {"decimals": 0}, nf))
+        return "-".join(vals)
+
+    hv = side(["Tensione MT", "Tensione MT2"])
+    lv = side(["Tensione BT1", "Tensione BT2"])
+    if hv and lv:
+        voltage = f"{hv} / {lv} V"
+    elif hv:
+        voltage = f"{hv} V"
     else:
         voltage = ""
     return main, voltage, serie
@@ -460,12 +493,13 @@ def parse(xlsx_path, schema=None, overrides=None):
     image_key = ov.get("__image__") or ov.get("image") or select_image(raw, family, schema)
 
     fields = build_fields(raw, family, schema)
-    std = standards_row(raw)
+    windings = build_windings(raw, schema)
     eff = efficiency_row(raw, schema)
-    if std:
-        fields.append(std)
-    if eff:
-        fields.append(eff)
+    sci = short_circuit_row(raw, schema)
+    wtr = winding_temp_row(raw, schema, windings)
+    for extra in (eff, sci, wtr):
+        if extra:
+            fields.append(extra)
 
     return {
         "raw": raw,
@@ -475,6 +509,7 @@ def parse(xlsx_path, schema=None, overrides=None):
         "fields": fields,
         "sections": grouped_sections(fields),
         "ratings": build_ratings(raw, schema),
+        "standards": standards_text(raw),
         "cesi": cesi_text(raw, family),
         "tests": build_tests(raw, family, ov.get("__earthing__")),
         "accessories_excel": accessories,

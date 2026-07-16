@@ -67,8 +67,8 @@ def main():
         "project": c2.text_input("Project", st.session_state.get("meta", {}).get("project", "")),
         "date": c3.text_input("Date", st.session_state.get("meta", {}).get("date", date.today().strftime("%d %B %Y"))),
         "offer": c1.text_input("Offer #", ""),
-        "pos": c2.text_input("Pos.", ""),
-        "product_code": c3.text_input("Product code", ""),
+        "revision": c2.text_input("Revision #", ""),
+        "pos": c3.text_input("Pos.", ""),
     }
 
     answers = st.session_state.get("answers", {})
@@ -144,6 +144,14 @@ def main():
 
     # ---------- summary + generate ----------
     st.subheader("Riepilogo valori in scheda")
+    with st.expander("Ratings", expanded=True):
+        rt = parsed["ratings"]
+        cols = "  |  ".join(rt["windings"])
+        st.write(f"**Avvolgimenti:** {cols}")
+        for row in rt["rows"]:
+            st.write(f"- {row['label']}: **{' | '.join(row['cells'])}**" + (f" {row['unit']}" if row["unit"] else ""))
+        for t in rt["taps"]:
+            st.write(f"- {t['label']}: **{t['value']}**")
     for s in parsed["sections"]:
         with st.expander(s["title"], expanded=False):
             for r in s["rows"]:

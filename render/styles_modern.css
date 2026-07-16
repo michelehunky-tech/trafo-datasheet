@@ -38,10 +38,14 @@ body{margin:0;}
 .ftr .pg::after{content:"Page " counter(page) " / " counter(pages);}
 
 /* ---- hero block: big title, code badge, no diagonal motif ---- */
-.hero{padding:8px 0 0;}
-.hero .eyebrow{font-size:8pt; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 4px;}
-.hero h1{font-size:34pt; font-weight:700; letter-spacing:-0.02em; line-height:1; margin:0;}
-.hero .sub{font-size:20pt; font-weight:500; color:var(--ink); margin-top:4px; letter-spacing:-0.01em;}
+.herowrap{width:100%; border-collapse:collapse; margin-top:8px;}
+.herowrap td{vertical-align:top; padding:0;}
+.herowrap .herotitle{width:74%;}
+.herowrap .herologos{width:26%; text-align:right; white-space:nowrap; vertical-align:top; padding-top:4px;}
+.herowrap .herologos img{height:17mm; width:auto; vertical-align:top; margin-left:8px;}
+.herowrap .cesicap{font-size:6pt; color:var(--ink-soft); margin-top:3px; line-height:1.3;}
+.herotitle h1{font-size:34pt; font-weight:700; letter-spacing:-0.02em; line-height:1; margin:0;}
+.herotitle .sub{font-size:20pt; font-weight:500; color:var(--ink); margin-top:4px; letter-spacing:-0.01em;}
 .badge{display:inline-block; background:var(--accent); color:var(--ink); font-weight:700;
   font-size:8pt; letter-spacing:.08em; padding:4px 10px; border-radius:2px; margin-top:3px;}
 
@@ -55,12 +59,14 @@ body{margin:0;}
 /* ---- centered hero figure ---- */
 .herofig{margin:16px 0 4px; text-align:center; page-break-inside:avoid;}
 .herofig .frame{background:var(--white); border:1pt solid var(--line); border-radius:0; padding:14px 10px 10px;}
-.herofig .figsvg{display:block; width:52%; height:auto; margin:0 auto;}
-.herofig .figimg{display:block; width:52%; height:auto; max-height:150mm; margin:0 auto;}
-.herofig .dimcap{margin-top:10px; font-size:8.5pt; font-weight:500; color:var(--ink-soft); text-align:center;}
-.herofig .dimcap .lbl{display:block; font-size:6.5pt; letter-spacing:.14em; text-transform:uppercase; margin-bottom:2px;}
-.herofig .capline{margin-top:10px; font-size:8.5pt; font-weight:500; color:var(--ink-soft);}
-.herofig .capline b{color:var(--ink); font-weight:600;}
+.herofig .figimg{display:block; height:78mm; width:auto; max-width:80%; margin:0 auto;}
+.herofig .dimcap{margin-top:8px; text-align:center;}
+.herofig .dimcap .lbl{font-size:6.5pt; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:3px;}
+.herofig .dimcap .meas{font-size:9pt; font-weight:600; color:var(--ink);
+  display:flex; align-items:center; justify-content:center; gap:6px;}
+.herofig .dimcap .axesicon{height:5mm; width:auto; opacity:.75;}
+.complied{margin:6px 0 0; font-size:8pt; color:var(--ink-soft); text-align:center;}
+.complied span{font-weight:600; color:var(--ink); text-transform:uppercase; letter-spacing:.06em; font-size:7pt;}
 
 /* ---- section header: bold word + thin rule, no diagonal tick ---- */
 .section{margin-top:15px; page-break-inside:avoid;}
@@ -75,6 +81,7 @@ body{margin:0;}
 .grid3 td{vertical-align:top; padding:0 8px 7px 0;}
 .cell{border-left:2pt solid var(--accent); padding:1px 0 1px 8px;}
 .cell .k{display:block; font-size:7pt; font-weight:500; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.05em;}
+.cell .k.raw{text-transform:none;}
 .cell .v{display:block; font-size:10.5pt; font-weight:600; margin-top:1px;}
 .cell .u{font-size:7.5pt; font-weight:400; color:var(--ink-soft);}
 
@@ -85,11 +92,6 @@ table.hvlv2 th{font-size:6.5pt; font-weight:700; letter-spacing:.1em; text-trans
 table.hvlv2 td{padding:5px 8px; border-bottom:.75pt solid var(--line); font-size:9pt;}
 table.hvlv2 td.k{width:34%; color:var(--ink-soft);}
 table.hvlv2 td.val{font-weight:600;}
-.herofig .frame{position:relative;}
-.cesi{position:absolute; top:10px; right:12px; text-align:right; z-index:2;}
-.cesi img{height:9mm; width:auto; display:block; margin-left:auto;}
-.cesi span{display:block; font-size:6.5pt; color:var(--ink-soft); margin-top:3px; line-height:1.3;}
-
 /* ---- accessories: pill list ---- */
 .acclist{width:100%; border-collapse:collapse;}
 .acclist td{padding:6px 0; border-bottom:.75pt solid var(--line); font-size:9pt;}
@@ -99,3 +101,5 @@ table.hvlv2 td.val{font-weight:600;}
 
 /* ---- notes: full width, quiet ---- */
 .notes p{margin:0; font-size:8.5pt; color:var(--ink-soft); line-height:1.5;}
+
+.dimnote{margin:6px 0 0; font-size:7pt; font-style:italic; color:var(--ink-soft);}
