@@ -233,34 +233,32 @@ def main():
             for r in s["rows"]:
                 st.write(f"- {r['en']}: **{r['value']}**" + (f" {r['unit']}" if r["unit"] else ""))
 
-    # accessories: precompilati dall'Excel, editabili. Robusto al re-run.
-    uploaded_id = st.session_state.get("uploaded", "file")
+    # accessories/test: value= precompila (mostra subito le righe); key legata al file
+    # + nonce per il ripristino.
+    uploaded_id = str(st.session_state.get("uploaded", "file")).replace(".", "_").replace(" ", "_")
     excel_acc = "\n".join(parsed.get("accessories_excel", []))
     excel_tests = "\n".join(parsed.get("tests", []))
 
     st.subheader("Accessories")
-    acc_key = f"acc_text::{uploaded_id}"
-    if acc_key not in st.session_state:
-        st.session_state[acc_key] = excel_acc
     ca1, ca2 = st.columns([5, 1])
     ca1.caption(f"{len(parsed.get('accessories_excel', []))} letti dall'Excel · uno per riga, modificabili")
     if ca2.button("↺ Excel", key="__reset_acc", help="Ripristina dagli accessori dell'Excel"):
-        st.session_state[acc_key] = excel_acc
+        st.session_state["acc_nonce"] = st.session_state.get("acc_nonce", 0) + 1
         st.rerun()
-    acc_text = st.text_area("Accessori", height=220, key=acc_key, label_visibility="collapsed")
+    acc_text = st.text_area("Accessori", value=excel_acc, height=220,
+                            key=f"accw_{uploaded_id}_{st.session_state.get('acc_nonce', 0)}",
+                            label_visibility="collapsed")
     accessories = [l.strip() for l in acc_text.split("\n") if l.strip()]
 
-    # routine tests: derivati dalle regole IEC, precompilati, modificabili
     st.subheader("Routine tests (IEC 60076-1)")
-    tests_key = f"tests_text::{uploaded_id}"
-    if tests_key not in st.session_state:
-        st.session_state[tests_key] = excel_tests
     ct1, ct2 = st.columns([5, 1])
     ct1.caption(f"{len(parsed.get('tests', []))} prove derivate dalle regole IEC · una per riga, modificabili")
     if ct2.button("↺ Regole", key="__reset_tests", help="Ripristina le prove derivate"):
-        st.session_state[tests_key] = excel_tests
+        st.session_state["tests_nonce"] = st.session_state.get("tests_nonce", 0) + 1
         st.rerun()
-    tests_text = st.text_area("Prove", height=260, key=tests_key, label_visibility="collapsed")
+    tests_text = st.text_area("Prove", value=excel_tests, height=260,
+                              key=f"testsw_{uploaded_id}_{st.session_state.get('tests_nonce', 0)}",
+                              label_visibility="collapsed")
     tests = [l.strip() for l in tests_text.split("\n") if l.strip()]
 
     notes = st.text_area("Notes (facoltative)", st.session_state.get("notes", ""))
