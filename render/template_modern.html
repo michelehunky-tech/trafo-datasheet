@@ -74,6 +74,9 @@
 
 {{ grid(sections.get('general')) }}
 {{ grid(sections.get('electrical')) }}
+{% if short_circuit %}
+<div class="scrow"><span class="sclbl">Short-circuit impedance</span><span class="scval">{{ short_circuit }}</span></div>
+{% endif %}
 
 {% if ratings and ratings.windings %}
 {% set ns.n = ns.n + 1 %}

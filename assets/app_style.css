@@ -330,9 +330,11 @@ button[key="__reset_acc"], button[key="__reset_tests"]{
   animation: teFadeUp 0.35s ease both;
 }
 [data-testid="stDialog"] [data-testid="stDownloadButton"] button{
-  background: var(--ink) !important; color:#fff !important; border:none !important;
-  font-size: 11pt !important; padding: 12px !important; margin-bottom: 6px;
+  background: var(--ink) !important; color: var(--accent) !important; border:none !important;
+  font-size: 11pt !important; font-weight: 700 !important; padding: 12px !important; margin-bottom: 6px;
 }
+[data-testid="stDialog"] [data-testid="stDownloadButton"] button *{ color: var(--accent) !important; }
 [data-testid="stDialog"] [data-testid="stDownloadButton"] button:hover{
   background: var(--accent) !important; color: var(--accent-ink) !important;
 }
+[data-testid="stDialog"] [data-testid="stDownloadButton"] button:hover *{ color: var(--accent-ink) !important; }

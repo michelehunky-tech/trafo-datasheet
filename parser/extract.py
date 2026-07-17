@@ -479,16 +479,18 @@ def designation_parts(raw, schema):
     power = raw.get("Potenza nominale MT")
     main = f"{format_value(power, {'decimals':0}, nf)} kVA" if not is_blank(power) else (serie or "Transformer")
 
-    def side(keys):
+    def side(keys, sort=False):
         vals = []
         for k in keys:
             v = raw.get(k)
             if not is_blank(v) and _f(v) not in (None, 0):
-                vals.append(format_value(v, {"decimals": 0}, nf))
-        return "-".join(vals)
+                vals.append(_f(v))
+        if sort:
+            vals = sorted(vals)
+        return "-".join(format_value(v, {"decimals": 0}, nf) for v in vals)
 
-    hv = side(["Tensione MT", "Tensione MT2"])
-    lv = side(["Tensione BT1", "Tensione BT2"])
+    hv = side(["Tensione MT", "Tensione MT2"], sort=True)          # doppia tensione: dal più basso
+    lv = side(["Tensione BT1", "Tensione BT2", "Tensione BT3"])    # avvolgimenti in ordine
     if hv and lv:
         voltage = f"{hv} / {lv} V"
     elif hv:
@@ -513,7 +515,7 @@ def parse(xlsx_path, schema=None, overrides=None):
     eff = efficiency_row(raw, schema)
     sci = short_circuit_row(raw, schema)
     wtr = winding_temp_row(raw, schema, windings)
-    for extra in (eff, sci, wtr):
+    for extra in (eff, wtr):
         if extra:
             fields.append(extra)
 
@@ -526,6 +528,7 @@ def parse(xlsx_path, schema=None, overrides=None):
         "sections": grouped_sections(fields),
         "ratings": build_ratings(raw, schema),
         "standards": standards_text(raw),
+        "short_circuit": sci["value"] if sci else None,
         "cesi": cesi_text(raw, family),
         "tests": build_tests(raw, family, ov.get("__earthing__")),
         "accessories_excel": accessories,

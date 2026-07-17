@@ -68,6 +68,7 @@ def render_pdf_modern(parsed, meta, notes, out_path, accessories=None, tests=Non
         figure_svg=figure_svg,
         cesi=parsed.get("cesi"),
         standards=parsed.get("standards"),
+        short_circuit=parsed.get("short_circuit"),
         accessories=acc,
         tests=tst,
         notes=notes,

@@ -108,3 +108,9 @@ table.hvlv2 td.val{font-weight:600;}
 .notes p{margin:0; font-size:8.5pt; color:var(--ink-soft); line-height:1.5;}
 
 .dimnote{margin:6px 0 0; font-size:7pt; font-style:italic; color:var(--ink-soft);}
+
+/* Short-circuit impedance: riga intera sotto Electrical */
+.scrow{ margin:-6px 0 14px; padding:8px 0 0 12px; border-left:2.5pt solid var(--accent); }
+.scrow .sclbl{ display:block; font-size:7pt; font-weight:500; color:var(--ink-soft);
+  text-transform:uppercase; letter-spacing:.05em; margin-bottom:2px; }
+.scrow .scval{ display:block; font-size:9.5pt; font-weight:600; color:var(--ink); }
