@@ -57,20 +57,55 @@ def logo_img_tag(cls="logo", height=None):
     return f'<img class="{cls}" src="data:image/png;base64,{b}"{style}>'
 
 
+def reset_all():
+    """Cancella tutto tranne autenticazione e tema, per iniziare una nuova scheda."""
+    keep = {"auth", "theme"}
+    for k in list(st.session_state.keys()):
+        if k not in keep:
+            del st.session_state[k]
+
+
+@st.dialog("Scheda tecnica pronta")
+def pdf_dialog():
+    data, fname = st.session_state.get("pdf_ready", (None, None))
+    if not data:
+        return
+    st.markdown('<div class="te-dialog-ok">✓</div>'
+                '<p style="text-align:center;margin:0 0 18px;color:var(--ink-soft);">'
+                'Il PDF è stato generato correttamente.</p>',
+                unsafe_allow_html=True)
+    st.download_button("⬇  Scarica il PDF", data, file_name=fname,
+                       mime="application/pdf", use_container_width=True)
+    if st.button("Chiudi", use_container_width=True, key="__close_dialog"):
+        st.session_state.pop("pdf_ready", None)
+        st.rerun()
+
+
 def header():
-    """Header interno: logo a sinistra, bottone tema (sole/luna) piccolo a destra."""
+    """Logo a sinistra; a destra: Nuova scheda · icona tema · logout."""
     current = st.session_state.get("theme", "light")
-    left, right = st.columns([8, 1])
-    with left:
+    c_logo, c_new, c_theme, c_out = st.columns([6, 1.6, 0.7, 0.7])
+    with c_logo:
         st.markdown(f'<div class="te-brand">{logo_img_tag(height="34px")}</div>',
                     unsafe_allow_html=True)
-    with right:
-        st.markdown('<div class="te-themebtn">', unsafe_allow_html=True)
+    with c_new:
+        if st.button("＋ Nuova scheda", key="__new", use_container_width=True):
+            reset_all()
+            st.rerun()
+    with c_theme:
+        st.markdown('<div class="te-iconbtn">', unsafe_allow_html=True)
         icon = "🌙" if current == "light" else "☀️"
-        nxt = "dark" if current == "light" else "light"
         if st.button(icon, key="__theme_btn", help="Cambia tema chiaro/scuro",
                      use_container_width=True):
-            st.session_state["theme"] = nxt
+            st.session_state["theme"] = "dark" if current == "light" else "light"
+            st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+    with c_out:
+        st.markdown('<div class="te-iconbtn">', unsafe_allow_html=True)
+        if st.button("⎋", key="__logout", help="Esci",
+                     use_container_width=True):
+            reset_all()
+            st.session_state["auth"] = False
             st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('<hr style="margin:2px 0 18px;border:none;border-top:1px solid var(--line);">',
@@ -263,12 +298,14 @@ def main():
 
     notes = st.text_area("Notes (facoltative)", st.session_state.get("notes", ""))
     if st.button("Genera PDF", type="primary"):
-        out = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
-        render_pdf_modern(parsed, meta, notes, out.name, accessories=accessories, tests=tests)
-        with open(out.name, "rb") as f:
-            st.download_button("Scarica la scheda tecnica (PDF)", f.read(),
-                               file_name=f"datasheet_{(meta['client'] or 'trafo').replace(' ', '_')}.pdf",
-                               mime="application/pdf")
+        with st.spinner("Generazione della scheda tecnica in corso…"):
+            out = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
+            render_pdf_modern(parsed, meta, notes, out.name, accessories=accessories, tests=tests)
+            with open(out.name, "rb") as f:
+                pdf_bytes = f.read()
+        fname = f"datasheet_{(meta['client'] or 'trafo').replace(' ', '_')}.pdf"
+        st.session_state["pdf_ready"] = (pdf_bytes, fname)
+        pdf_dialog()
 
 
 if gate():
