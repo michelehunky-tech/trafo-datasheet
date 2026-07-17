@@ -130,10 +130,20 @@ def translate(label, raw_value, schema):
     Returns (display, translated_ok). translated_ok=False means the value is
     not in the map and must be confirmed in the dynamic form."""
     vmap = schema.get("value_map", {})
-    if label in vmap and not is_blank(raw_value):
+    # i campi avvolgimento (Materiale/Tipo avvolg. BT1/BT2/BT3…) condividono lo
+    # stesso dizionario dell'MT
+    lookup = label
+    if label.startswith("Materiale "):
+        lookup = "Materiale MT"
+    elif label.startswith("Tipo avvolg. "):
+        lookup = "Tipo avvolg. MT"
+    if lookup in vmap and not is_blank(raw_value):
         key = str(raw_value).strip()
-        if key in vmap[label]:
-            return vmap[label][key], True
+        if key in vmap[lookup]:
+            return vmap[lookup][key], True
+        toks = key.split()
+        if len(toks) > 1 and toks[0] in vmap[lookup]:
+            return f"{vmap[lookup][toks[0]]} {' '.join(toks[1:])}", True
         return key, False  # text value present but not mapped -> needs confirmation
     return None, True  # not a mapped field
 
@@ -184,6 +194,9 @@ WINDINGS = [
     ("BT2", {"V": "Tensione BT2", "P": "Potenza nominale BT2",
              "conn": "Collegamento BT2", "ins": "Classe isolamento BT2", "mat": "Materiale BT2",
              "wt": "Tipo avvolg. BT2", "tc": "Classe termica BT2", "tr": "Sovratemperatura avvolg. BT2"}),
+    ("BT3", {"V": "Tensione BT3", "P": "Potenza nominale BT3",
+             "conn": "Collegamento BT3", "ins": "Classe isolamento BT3", "mat": "Materiale BT3",
+             "wt": "Tipo avvolg. BT3", "tc": "Classe termica BT3", "tr": "Sovratemperatura avvolg. BT3"}),
 ]
 WINDING_ROWS = [
     ("Rated power", "P", "kVA", 0),
@@ -198,7 +211,10 @@ WINDING_ROWS = [
 IMPEDANCES = [
     ("Impedenza di cortocircuito % MT-BT1", "MT", "BT1"),
     ("Impedenza di cortocircuito % MT-BT2", "MT", "BT2"),
+    ("Impedenza di cortocircuito % MT-BT3", "MT", "BT3"),
     ("Impedenza di cortocircuito % BT1-BT2", "BT1", "BT2"),
+    ("Impedenza di cortocircuito % BT1-BT3", "BT1", "BT3"),
+    ("Impedenza di cortocircuito % BT2-BT3", "BT2", "BT3"),
 ]
 
 

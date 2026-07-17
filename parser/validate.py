@@ -47,7 +47,10 @@ def validate(parsed, schema, portal_inputs=None):
             continue
         label = f["it"]
         if label in vmap and not is_blank(raw.get(label)):
-            if str(raw[label]).strip() not in vmap[label]:
+            val = str(raw[label]).strip()
+            toks = val.split()
+            mapped = (val in vmap[label]) or (len(toks) > 1 and toks[0] in vmap[label])
+            if not mapped:
                 items.append({"kind": "translate", "key": label, "label": f["en"],
                               "unit": None, "raw": str(raw[label]),
                               "options": list(vmap[label].values())})

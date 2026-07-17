@@ -14,7 +14,7 @@ F = [
  ("Installazione","Installation","general",None,None,"both",True,False,False),
  ("Protezione superficiale","Surface protection","general",None,None,"both",True,False,False),
  ("Colore","Paint colour","general",None,None,"both",True,False,False),
- ("THDi","Loading application (THDi)","general","%",1,"both",True,False,False),
+ ("THDi","THDi","general","%",1,"both",True,False,False),
 
  ("Numero fasi","Number of phases","electrical",None,0,"both",True,True,False),
  ("Frequenza","Frequency","electrical","Hz",0,"both",True,True,False),
@@ -47,12 +47,12 @@ for it,en,sec,unit,dec,fam,inc,req,sz in F:
     if sz: d["suppress_if_zero"]=True
     fields.append(d)
 
-winding={"Strati":"Layer","Dischi":"Disc","Continuo":"Continuous disc","Elicoidale":"Helical",
+winding={"Strati":"Layer","Dischi":"Disc","Disco":"Disc","Continuo":"Continuous disc","Elicoidale":"Helical",
          "Bobine":"Coil","Inglobata":"Cast (encapsulated)","Impregnata":"Impregnated"}
 material={"Al":"Aluminium","Cu":"Copper"}
 value_map={
  "Tipo casa":{"Conservatore":"Conservator","Ermetico":"Hermetically sealed"},
- "Tipo sistema raffreddamento":{"Radiatori":"Radiators","Onde":"Corrugated walls"},
+ "Tipo sistema raffreddamento":{"Radiatori":"Radiators","Onde":"Corrugated walls","Scambiatore":"Heat exchanger"},
  "Tipo commutatore":{"Reg. sottocarico":"On-load tap changer (OLTC)","A vuoto":"Off-circuit tap changer (DETC)",
                      "Reg. a vuoto":"Off-circuit tap changer (DETC)","Nessuno":"None"},
  "Applicazione":{"Distribuzione":"Distribution","Conversione":"Conversion","Trasmissione":"Transmission",

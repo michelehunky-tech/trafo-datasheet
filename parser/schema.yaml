@@ -48,6 +48,7 @@ value_map:
   Tipo sistema raffreddamento:
     Radiatori: Radiators
     Onde: Corrugated walls
+    Scambiatore: Heat exchanger
   Tipo commutatore:
     Reg. sottocarico: On-load tap changer (OLTC)
     A vuoto: Off-circuit tap changer (DETC)
@@ -72,6 +73,7 @@ value_map:
   Tipo avvolg. MT: &id002
     Strati: Layer
     Dischi: Disc
+    Disco: Disc
     Continuo: Continuous disc
     Elicoidale: Helical
     Bobine: Coil
