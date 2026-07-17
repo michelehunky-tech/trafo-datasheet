@@ -282,23 +282,21 @@ p, div, span, li{ color: var(--ink); }
 }
 
 /* ============================================================
-   HEADER + THEME BUTTONS (sole/luna)
+   HEADER + THEME BUTTON (bottone singolo, piccolo)
    ============================================================ */
 .te-brand img{ height: 34px; width:auto; display:block; }
-.te-header-row{ animation: teFadeUp 0.4s ease both; }
 
-/* i due bottoni tema: piccoli, icone grandi */
-[data-testid="stButton"] button[data-testid*="theme"],
-button[key="__theme_light"],
-button[key="__theme_dark"]{
-  padding: 6px 0 !important;
-  font-size: 16pt !important;
+/* la colonna piu' a destra dell'header contiene il bottone tema: rendilo piccolo */
+.te-themebtn{ display:flex; justify-content:flex-end; }
+.te-themebtn ~ div [data-testid="stButton"] button{
+  padding: 4px 8px !important;
+  font-size: 12pt !important;
+  min-height: 34px !important;
   line-height: 1 !important;
-  min-height: 40px;
+  border-radius: 8px !important;
 }
-
-/* i due bottoni sono in colonne strette; li ridimensiono */
-div[data-testid="column"]:has(button[key="__theme_light"]),
-div[data-testid="column"]:has(button[key="__theme_dark"]){
-  padding: 0 3px !important;
+/* reset/ripristino accessori-test: bottoncini discreti */
+button[key="__reset_acc"], button[key="__reset_tests"]{
+  font-size: 8pt !important; padding: 4px 6px !important; min-height: 30px !important;
+  color: var(--ink-soft) !important;
 }
