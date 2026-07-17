@@ -101,23 +101,23 @@
 {{ grid(sections.get('dimensions')) }}
 <p class="dimnote">Dimensions, weights and accessories are indicative only. Not for construction.</p>
 
-{% if tests %}
-<div class="section">
-  <div class="sechead"><span class="num">T</span><h2>Routine tests (IEC 60076-1)</h2><span class="ln"></span></div>
-  <table class="acclist">
-    {% for t in tests %}
-    <tr><td class="acc1">{{ t }}</td></tr>
-    {% endfor %}
-  </table>
-</div>
-{% endif %}
-
 {% if accessories %}
 <div class="section">
   <div class="sechead"><span class="num">A</span><h2>Accessories</h2><span class="ln"></span></div>
   <table class="acclist">
     {% for a in accessories %}
     <tr><td class="acc1">{{ a }}</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endif %}
+
+{% if tests %}
+<div class="section">
+  <div class="sechead"><span class="num">T</span><h2>Routine tests (IEC 60076-1)</h2><span class="ln"></span></div>
+  <table class="acclist">
+    {% for t in tests %}
+    <tr><td class="acc1">{{ t }}</td></tr>
     {% endfor %}
   </table>
 </div>
