@@ -269,33 +269,22 @@ def main():
             for r in s["rows"]:
                 st.write(f"- {r['en']}: **{r['value']}**" + (f" {r['unit']}" if r["unit"] else ""))
 
-    # accessories/test: value= precompila (mostra subito le righe); key legata al file
-    # + nonce per il ripristino.
+    # accessories/test: mostrati in sola lettura (non editabili)
     uploaded_id = str(st.session_state.get("uploaded", "file")).replace(".", "_").replace(" ", "_")
-    excel_acc = "\n".join(parsed.get("accessories_excel", []))
-    excel_tests = "\n".join(parsed.get("tests", []))
+    accessories = parsed.get("accessories_excel", [])
+    tests = parsed.get("tests", [])
 
     st.subheader("Accessories")
-    ca1, ca2 = st.columns([5, 1])
-    ca1.caption(f"{len(parsed.get('accessories_excel', []))} letti dall'Excel · uno per riga, modificabili")
-    if ca2.button("↺ Excel", key="__reset_acc", help="Ripristina dagli accessori dell'Excel"):
-        st.session_state["acc_nonce"] = st.session_state.get("acc_nonce", 0) + 1
-        st.rerun()
-    acc_text = st.text_area("Accessori", value=excel_acc, height=220,
-                            key=f"accw_{uploaded_id}_{st.session_state.get('acc_nonce', 0)}",
-                            label_visibility="collapsed")
-    accessories = [l.strip() for l in acc_text.split("\n") if l.strip()]
+    st.caption(f"{len(accessories)} dall'Excel")
+    st.text_area("Accessori", value="\n".join(accessories), height=220,
+                 disabled=True, label_visibility="collapsed",
+                 key=f"accview_{uploaded_id}")
 
     st.subheader("Routine tests (IEC 60076-1)")
-    ct1, ct2 = st.columns([5, 1])
-    ct1.caption(f"{len(parsed.get('tests', []))} prove derivate dalle regole IEC · una per riga, modificabili")
-    if ct2.button("↺ Regole", key="__reset_tests", help="Ripristina le prove derivate"):
-        st.session_state["tests_nonce"] = st.session_state.get("tests_nonce", 0) + 1
-        st.rerun()
-    tests_text = st.text_area("Prove", value=excel_tests, height=260,
-                              key=f"testsw_{uploaded_id}_{st.session_state.get('tests_nonce', 0)}",
-                              label_visibility="collapsed")
-    tests = [l.strip() for l in tests_text.split("\n") if l.strip()]
+    st.caption(f"{len(tests)} prove derivate dalle regole IEC")
+    st.text_area("Prove", value="\n".join(tests), height=260,
+                 disabled=True, label_visibility="collapsed",
+                 key=f"testsview_{uploaded_id}")
 
     notes = st.text_area("Notes (facoltative)", st.session_state.get("notes", ""))
 
@@ -310,7 +299,7 @@ def main():
             gloss = load_lang(lang_code)["accessories"]
             acc_out = [translate_accessory(a, gloss) for a in accessories]
             # test: se l'operatore non li ha modificati usa quelli tradotti; altrimenti i suoi
-            tests_out = parsed_lang["tests"] if tests == parsed.get("tests") else tests
+            tests_out = parsed_lang["tests"]
             out = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
             render_pdf_modern(parsed_lang, meta, notes, out.name,
                               accessories=acc_out, tests=tests_out)
