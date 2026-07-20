@@ -27,7 +27,7 @@
 <div id="pageHeader">
   <table class="hdr"><tr>
     <td class="logo"><img src="assets/logo.png"></td>
-    <td class="tag"><span class="tagtext">Technical Datasheet</span></td>
+    <td class="tag"><span class="tagtext">{{ ui.doc_title }}</span></td>
   </tr></table>
 </div>
 
@@ -42,7 +42,7 @@
   <td class="herotitle">
     <h1>{{ designation_main }}</h1>
     <p class="sub">{{ designation_voltage }}{% if designation_series %} &nbsp;—&nbsp; {{ designation_series }}{% endif %}</p>
-    {% if meta.offer %}<span class="badge">Offer {{ meta.offer }}{% if meta.revision %} rev.{{ meta.revision }}{% endif %}</span>{% endif %}
+    {% if meta.offer %}<span class="badge">{{ ui.offer }} {{ meta.offer }}{% if meta.revision %} {{ ui.revision }}{{ meta.revision }}{% endif %}</span>{% endif %}
   </td>
   <td class="herologos">
     <span class="stack">
@@ -54,12 +54,12 @@
 
 <table class="metastrip">
   <tr>
-    <td style="width:40%"><span class="lbl">Client</span><span class="val">{{ meta.client or '—' }}</span></td>
-    <td style="width:35%"><span class="lbl">Date</span><span class="val">{{ meta.date or '—' }}</span></td>
-    <td style="width:25%"><span class="lbl">Pos.</span><span class="val">{{ meta.pos or '—' }}</span></td>
+    <td style="width:40%"><span class="lbl">{{ ui.client }}</span><span class="val">{{ meta.client or '—' }}</span></td>
+    <td style="width:35%"><span class="lbl">{{ ui.date }}</span><span class="val">{{ meta.date or '—' }}</span></td>
+    <td style="width:25%"><span class="lbl">{{ ui.pos }}</span><span class="val">{{ meta.pos or '—' }}</span></td>
   </tr>
   <tr>
-    <td colspan="3" class="projrow"><span class="lbl">Project</span><span class="val">{{ meta.project or '—' }}</span></td>
+    <td colspan="3" class="projrow"><span class="lbl">{{ ui.project }}</span><span class="val">{{ meta.project or '—' }}</span></td>
   </tr>
 </table>
 
@@ -68,7 +68,7 @@
   <div class="frame">
     {{ figure_svg|safe }}
   </div>
-  {% if standards %}<p class="complied"><span>To Comply with:</span> {{ standards }}</p>{% endif %}
+  {% if standards %}<p class="complied"><span>{{ ui.to_comply }}</span> {{ standards }}</p>{% endif %}
 </div>
 {% endif %}
 
@@ -82,9 +82,9 @@
 {% set ns.n = ns.n + 1 %}
 {% set nw = ratings.windings|length %}
 <div class="section">
-  <div class="sechead"><span class="num">{{ ns.n }}</span><h2>Ratings</h2><span class="ln"></span></div>
+  <div class="sechead"><span class="num">{{ ns.n }}</span><h2>{{ sections_ui.ratings }}</h2><span class="ln"></span></div>
   <table class="hvlv2">
-    <tr><th>Parameter</th>{% for w in ratings.windings %}<th>{{ w }}</th>{% endfor %}</tr>
+    <tr><th>{{ ui.parameter }}</th>{% for w in ratings.windings %}<th>{{ w }}</th>{% endfor %}</tr>
     {% for row in ratings.rows %}
     <tr><td class="k">{{ row.label }}</td>
       {% for c in row.cells %}<td class="val">{{ c }}{% if row.unit and c != '–' %} <span class="u">{{ row.unit }}</span>{% endif %}</td>{% endfor %}
@@ -102,11 +102,11 @@
 
 {{ grid(sections.get('environmental')) }}
 {{ grid(sections.get('dimensions')) }}
-<p class="dimnote">Dimensions, weights and accessories are indicative only. Not for construction.</p>
+<p class="dimnote">{{ ui.disclaimer }}</p>
 
 {% if accessories %}
 <div class="section">
-  <div class="sechead"><span class="num">A</span><h2>Accessories</h2><span class="ln"></span></div>
+  <div class="sechead"><span class="num">A</span><h2>{{ sections_ui.accessories }}</h2><span class="ln"></span></div>
   <table class="acclist">
     {% for a in accessories %}
     <tr><td class="acc1">{{ a }}</td></tr>
@@ -117,7 +117,7 @@
 
 {% if tests %}
 <div class="section">
-  <div class="sechead"><span class="num">T</span><h2>Routine tests (IEC 60076-1)</h2><span class="ln"></span></div>
+  <div class="sechead"><span class="num">T</span><h2>{{ sections_ui.tests }}</h2><span class="ln"></span></div>
   <table class="acclist">
     {% for t in tests %}
     <tr><td class="acc1">{{ t }}</td></tr>
@@ -128,13 +128,13 @@
 
 {% if notes %}
 <div class="section notes">
-  <div class="sechead"><span class="num">N</span><h2>Notes</h2><span class="ln"></span></div>
+  <div class="sechead"><span class="num">N</span><h2>{{ sections_ui.notes }}</h2><span class="ln"></span></div>
   <p>{{ notes }}</p>
 </div>
 {% endif %}
 
 <div class="section notes" style="margin-top:18px; border-top:.5pt solid var(--line); padding-top:8px;">
-  <p style="font-size:7.5pt; font-style:italic;">Dimensions, weights and accessories are indicative only. Not for construction.</p>
+  <p style="font-size:7.5pt; font-style:italic;">{{ ui.disclaimer }}</p>
 </div>
 
 </body></html>

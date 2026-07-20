@@ -1,0 +1,158 @@
+number_format:
+  decimal: .
+  thousands: ','
+ui:
+  doc_title: Technical Datasheet
+  parameter: Parameter
+  to_comply: 'To Comply with:'
+  overall: Overall L × W × H
+  disclaimer: Dimensions, weights and accessories are indicative only. Not for construction.
+  offer: Offer
+  revision: rev.
+  client: Client
+  date: Date
+  pos: Pos.
+  project: Project
+  cesi_suffix: type test nr. B4013916
+sections:
+  general: General
+  electrical: Electrical
+  ratings: Ratings
+  environmental: Working Conditions
+  dimensions: Dimensions & weight
+  accessories: Accessories
+  tests: Routine tests (IEC 60076-1)
+  notes: Notes
+fields:
+  Serie: Series
+  Tipo casa: Construction
+  Tipo sistema raffreddamento: Cooling system
+  Raffreddamento: Cooling
+  Applicazione: Application
+  THDi: THDi
+  Tipologia olio: Oil type
+  Classe amb / clim / fuoco: Environmental / climatic / fire class
+  Installazione: Installation
+  Protezione superficiale: Surface protection
+  Colore: Paint colour
+  Numero fasi: Number of phases
+  Frequenza: Frequency
+  Gruppo vettoriale: Vector group
+  Perdite a vuoto: No-load losses
+  Perdite a carico 75°C: Load losses 75°C
+  Perdite a carico 120°C: Load losses 120°C
+  Corrente a vuoto %: No-load current
+  Temp. Ambiente MIN: Min ambient temperature
+  Temp. Ambiente MAX: Max ambient temperature
+  Altitudine: Max installation altitude
+  Sovratemperatura olio: Oil temperature rise
+  LpA: Sound pressure level (LpA)
+  LwA: Sound power level (LwA)
+  Lunghezza trafo: Length
+  Larghezza trafo: Width
+  Altezza trafo: Height
+  Peso totale maggiorato: Total weight
+  Peso olio maggiorato: Oil weight
+  Interasse ruote: Distance between wheels
+  Ø ruote: Wheel diameter
+  Rated power: Rated power
+  Voltage: Voltage
+  Connection: Connection
+  Insulation level: Insulation level
+  Winding material: Winding material
+  Winding type: Winding type
+  Thermal class: Thermal class
+  Winding temp. rise: Winding temp. rise
+  Tap changer: Tap changer
+  Tap positions (+/-): Tap positions (+/-)
+  Step per tap: Step per tap
+  Short-circuit impedance: Short-circuit impedance
+  Efficiency index (PEI): Efficiency index (PEI)
+  Efficiency index (MEPS/HEPS): Efficiency index (MEPS/HEPS)
+  Efficiency index: Efficiency index
+values:
+  Conservatore: Conservator
+  Ermetico: Hermetically sealed
+  Radiatori: Radiators
+  Onde: Corrugated walls
+  Scambiatore: Heat exchanger
+  Reg. sottocarico: On-load tap changer (OLTC)
+  A vuoto: Off-circuit tap changer (DETC)
+  Reg. a vuoto: Off-circuit tap changer (DETC)
+  Nessuno: None
+  Distribuzione: Distribution
+  Conversione: Conversion
+  Trasmissione: Transmission
+  Trazione: Traction
+  Fotovoltaico: Photovoltaic
+  Eolico: Wind
+  Interno / Esterno: Indoor / Outdoor
+  Interno: Indoor
+  Esterno: Outdoor
+  Al: Aluminium
+  Cu: Copper
+  Strati: Layer
+  Dischi: Disc
+  Disco: Disc
+  Continuo: Continuous disc
+  Elicoidale: Helical
+  Bobine: Coil
+  Inglobata: Cast (encapsulated)
+  Impregnata: Impregnated
+tests:
+  header: 'Routine tests IEC 60076-1:'
+  winding_resistance: Measurement of winding resistance
+  voltage_ratio: Measurement of voltage ratio and check of phase displacement
+  sc_impedance_load_loss: Measurement of short-circuit impedance and load loss
+  no_load_loss: Measurement of no-load loss and current
+  dielectric_header: 'Dielectric routine tests:'
+  av: Applied voltage test (AV)
+  ivw: Induced voltage withstand test (IVW)
+  ivpd: Induced voltage test with PD measurement (IVPD)
+  auxw: Auxiliary wiring insulation test (AuxW) — only if present
+  li: Full wave lightning impulse test for the line terminals (LI)
+  ltac: Line terminal AC withstand voltage test (LTAC) — only for non-uniform insulation
+  oltc: Tests on on-load tap-changers, where appropriate
+  tightness: Leak testing with pressure for liquid-immersed transformers (tightness test)
+  ct_check: Check of the ratio and polarity of built-in current transformers — only if present
+  core_frame: Check of core and frame insulation for liquid immersed transformers with core or frame insulation
+  zero_sequence: Measurement of zero-sequence impedance
+  um_header: 'Additional routine tests (Um > 72.5 kV):'
+  capacitances: Determination of capacitances windings-to-earth and between windings
+  dc_insulation: Measurement of d.c. insulation resistance between each winding to earth and between windings
+  tan_delta: Measurement of dissipation factor (tan δ) of the insulation system capacitances
+  dga: Measurement of dissolved gases in dielectric liquid from each oil compartment
+  no_load_90_110: Measurement of no-load loss and current at 90 % and 110 % of rated voltage
+  earthing_note: ' — only for earthing transformer with secondary winding'
+accessories:
+  Isolatori MT in porcellana: MV porcelain insulators
+  Isolatori BT1 in porcellana: LV1 porcelain insulators
+  Isolatori BT2 in porcellana: LV2 porcelain insulators
+  Isolatori BT3 in porcellana: LV3 porcelain insulators
+  Commutatore a vuoto: Off-circuit tap changer
+  Targa dati: Rating plate
+  Ruote: Wheels
+  Valvola di scarico olio: Oil drain valve
+  Valvola trattamento olio: Oil treatment valve
+  Valvole di campionamento: Sampling valves
+  Essiccatore silica gel: Silica-gel breather
+  Valvole di sovrapressione con contatti: Pressure relief valves with contacts
+  Schermo elettrostatico BT-MT: LV-MV electrostatic shield
+  Indicatore di temperatura olio con contatti: Oil temperature indicator with contacts
+  Indicatore di temperatura avvolgimenti con contatti: Winding temperature indicator with contacts
+  Indicatore di livello olio con contatti: Oil level indicator with contacts
+  Relè Buchholz con contatti: Buchholz relay with contacts
+  Supporti antivibranti: Anti-vibration mounts
+  Punti fissi a sfera MT: MV ball-type fixing points
+  Punti fissi a sfera BT1: LV1 ball-type fixing points
+  Punti fissi a sfera BT2: LV2 ball-type fixing points
+  Punti fissi a sfera BT3: LV3 ball-type fixing points
+  Cassetta centralizzazione ausiliari: Auxiliary marshalling box
+  Sonda temperatura olio PT100: PT100 oil temperature probe
+  Scaricatori MT: MV surge arresters
+  Box di protezione isolatori BT1: LV1 bushing protection box
+  Box di protezione isolatori BT2: LV2 bushing protection box
+  Box di protezione isolatori BT3: LV3 bushing protection box
+  Kit ventilazione forzata: Forced-air cooling kit
+  Cuscino separatore nel conservatore: Air-cell in conservator
+  Analizzatore gas disciolti: Dissolved-gas analyser

@@ -292,13 +292,28 @@ def main():
     tests = [l.strip() for l in tests_text.split("\n") if l.strip()]
 
     notes = st.text_area("Notes (facoltative)", st.session_state.get("notes", ""))
+
+    LANGS = {"Italiano": "it", "English": "en", "Français": "fr", "Deutsch": "de", "Español": "es"}
+    lang_label = st.selectbox("Lingua scheda tecnica", list(LANGS.keys()), index=1)
+    lang_code = LANGS[lang_label]
+
     if st.button("Genera PDF", type="primary"):
         with st.spinner("Generazione della scheda tecnica in corso…"):
+            from parser.extract import load_lang, translate_accessory
+            # ri-parsa nella lingua scelta (etichette, sezioni, ratings, test tradotti)
+            parsed_lang = parse(st.session_state["xlsx_path"], schema,
+                                overrides=overrides, lang_code=lang_code)
+            # accessori: dal form (italiano) -> tradotti via glossario, mantenendo qtà e parametri
+            gloss = load_lang(lang_code)["accessories"]
+            acc_out = [translate_accessory(a, gloss) for a in accessories]
+            # test: se l'operatore non li ha modificati usa quelli tradotti; altrimenti i suoi
+            tests_out = parsed_lang["tests"] if tests == parsed.get("tests") else tests
             out = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
-            render_pdf_modern(parsed, meta, notes, out.name, accessories=accessories, tests=tests)
+            render_pdf_modern(parsed_lang, meta, notes, out.name,
+                              accessories=acc_out, tests=tests_out)
             with open(out.name, "rb") as f:
                 pdf_bytes = f.read()
-        fname = f"datasheet_{(meta['client'] or 'trafo').replace(' ', '_')}.pdf"
+        fname = f"datasheet_{(meta['client'] or 'trafo').replace(' ', '_')}_{lang_code}.pdf"
         st.session_state["pdf_ready"] = (pdf_bytes, fname)
         pdf_dialog()
 

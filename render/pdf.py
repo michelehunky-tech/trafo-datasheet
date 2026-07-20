@@ -17,12 +17,12 @@ def _fmt(v):
         return str(v)
 
 
-def build_figure_svg(image_key, dims):
+def build_figure_svg(image_key, dims, overall_label="Overall L × W × H"):
     """Immagine + misure L×W×H con label e icona cartesiano. Nessuna quota sul disegno."""
     rel = f"assets/transformers/{image_key}.png"
     return (f'<img class="figimg" src="{rel}">'
             f'<div class="dimcap">'
-            f'<div class="lbl">Overall L × W × H</div>'
+            f'<div class="lbl">{overall_label}</div>'
             f'<div class="meas"><img class="axesicon" src="assets/cartesiano.png">'
             f'<span>{_fmt(dims["L"])} × {_fmt(dims["W"])} × {_fmt(dims["H"])} mm</span></div>'
             f'</div>')
@@ -48,12 +48,15 @@ def render_pdf(parsed, meta, notes, out_path, accessories=None):
 
 def render_pdf_modern(parsed, meta, notes, out_path, accessories=None, tests=None):
     """Alternative layout: Space Grotesk, centered hero figure, numbered sections."""
-    from parser.extract import designation_parts, load_schema
     env = Environment(loader=FileSystemLoader(str(RENDER_DIR)),
                       autoescape=select_autoescape(["html"]))
     tpl = env.get_template("template_modern.html")
-    figure_svg = build_figure_svg(parsed["image_key"], parsed["dims"]) if parsed["image_key"] else ""
-    main, voltage, serie = designation_parts(parsed["raw"], load_schema())
+    ui = parsed.get("ui", {})
+    sections_ui = parsed.get("sections_ui", {})
+    figure_svg = (build_figure_svg(parsed["image_key"], parsed["dims"],
+                                   ui.get("overall", "Overall L × W × H"))
+                  if parsed["image_key"] else "")
+    main, voltage, serie = parsed.get("designation_parts", ("", "", ""))
     acc = accessories if accessories is not None else parsed.get("accessories_excel", [])
     acc = [a for a in acc if str(a).strip()]
     tst = tests if tests is not None else parsed.get("tests", [])
@@ -63,6 +66,8 @@ def render_pdf_modern(parsed, meta, notes, out_path, accessories=None, tests=Non
         designation_voltage=voltage,
         designation_series=serie,
         meta=meta,
+        ui=ui,
+        sections_ui=sections_ui,
         sections={s["key"]: s for s in parsed["sections"]},
         ratings=parsed["ratings"],
         figure_svg=figure_svg,

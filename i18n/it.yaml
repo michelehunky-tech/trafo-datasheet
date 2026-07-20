@@ -1,0 +1,158 @@
+number_format:
+  decimal: ','
+  thousands: .
+ui:
+  doc_title: Scheda tecnica
+  parameter: Parametro
+  to_comply: 'Conforme a:'
+  overall: Ingombro L × W × H
+  disclaimer: Dimensioni, pesi e accessori sono indicativi. Non validi per la costruzione.
+  offer: Offerta
+  revision: rev.
+  client: Cliente
+  date: Data
+  pos: Pos.
+  project: Progetto
+  cesi_suffix: type test nr. B4013916
+sections:
+  general: Generale
+  electrical: Caratteristiche elettriche
+  ratings: Dati nominali
+  environmental: Condizioni di esercizio
+  dimensions: Dimensioni e peso
+  accessories: Accessori
+  tests: Prove di routine (IEC 60076-1)
+  notes: Note
+fields:
+  Serie: Serie
+  Tipo casa: Costruzione
+  Tipo sistema raffreddamento: Sistema di raffreddamento
+  Raffreddamento: Raffreddamento
+  Applicazione: Applicazione
+  THDi: THDi
+  Tipologia olio: Tipo di olio
+  Classe amb / clim / fuoco: Classe ambientale / climatica / fuoco
+  Installazione: Installazione
+  Protezione superficiale: Protezione superficiale
+  Colore: Colore
+  Numero fasi: Numero di fasi
+  Frequenza: Frequenza
+  Gruppo vettoriale: Gruppo vettoriale
+  Perdite a vuoto: Perdite a vuoto
+  Perdite a carico 75°C: Perdite a carico 75°C
+  Perdite a carico 120°C: Perdite a carico 120°C
+  Corrente a vuoto %: Corrente a vuoto
+  Temp. Ambiente MIN: Temperatura ambiente min.
+  Temp. Ambiente MAX: Temperatura ambiente max.
+  Altitudine: Altitudine max. installazione
+  Sovratemperatura olio: Sovratemperatura olio
+  LpA: Livello pressione sonora (LpA)
+  LwA: Livello potenza sonora (LwA)
+  Lunghezza trafo: Lunghezza
+  Larghezza trafo: Larghezza
+  Altezza trafo: Altezza
+  Peso totale maggiorato: Peso totale
+  Peso olio maggiorato: Peso olio
+  Interasse ruote: Interasse ruote
+  Ø ruote: Diametro ruote
+  Rated power: Potenza nominale
+  Voltage: Tensione
+  Connection: Collegamento
+  Insulation level: Livello di isolamento
+  Winding material: Materiale avvolgimento
+  Winding type: Tipo avvolgimento
+  Thermal class: Classe termica
+  Winding temp. rise: Sovratemperatura avvolgimento
+  Tap changer: Commutatore
+  Tap positions (+/-): Posizioni (+/-)
+  Step per tap: Gradino per posizione
+  Short-circuit impedance: Impedenza di cortocircuito
+  Efficiency index (PEI): Indice di efficienza (PEI)
+  Efficiency index (MEPS/HEPS): Indice di efficienza (MEPS/HEPS)
+  Efficiency index: Indice di efficienza
+values:
+  Conservatore: Conservatore
+  Ermetico: Ermetico
+  Radiatori: Radiatori
+  Onde: Onde
+  Scambiatore: Scambiatore
+  Reg. sottocarico: Commutatore sotto carico (OLTC)
+  A vuoto: Commutatore a vuoto (DETC)
+  Reg. a vuoto: Commutatore a vuoto (DETC)
+  Nessuno: Nessuno
+  Distribuzione: Distribuzione
+  Conversione: Conversione
+  Trasmissione: Trasmissione
+  Trazione: Trazione
+  Fotovoltaico: Fotovoltaico
+  Eolico: Eolico
+  Interno / Esterno: Interno / Esterno
+  Interno: Interno
+  Esterno: Esterno
+  Al: Alluminio
+  Cu: Rame
+  Strati: Strati
+  Dischi: Dischi
+  Disco: Dischi
+  Continuo: Disco continuo
+  Elicoidale: Elicoidale
+  Bobine: Bobine
+  Inglobata: Inglobato
+  Impregnata: Impregnato
+tests:
+  header: 'Prove di routine IEC 60076-1:'
+  winding_resistance: Misura della resistenza degli avvolgimenti
+  voltage_ratio: Misura del rapporto di trasformazione e verifica dello spostamento di fase
+  sc_impedance_load_loss: Misura dell'impedenza di cortocircuito e delle perdite a carico
+  no_load_loss: Misura delle perdite e della corrente a vuoto
+  dielectric_header: 'Prove dielettriche di routine:'
+  av: Prova di tensione applicata (AV)
+  ivw: Prova di tensione indotta di tenuta (IVW)
+  ivpd: Prova di tensione indotta con misura delle scariche parziali (IVPD)
+  auxw: Prova di isolamento dei circuiti ausiliari (AuxW) — solo se presenti
+  li: Prova di impulso atmosferico a onda piena sui terminali di linea (LI)
+  ltac: Prova di tensione applicata sui terminali di linea (LTAC) — solo per isolamento non uniforme
+  oltc: Prove sul commutatore sotto carico, ove applicabile
+  tightness: Prova di tenuta in pressione per trasformatori in olio (tightness test)
+  ct_check: Verifica del rapporto e della polarità dei TA incorporati — solo se presenti
+  core_frame: Verifica dell'isolamento di nucleo e struttura per trasformatori in olio con isolamento di nucleo o struttura
+  zero_sequence: Misura dell'impedenza omopolare
+  um_header: 'Prove di routine aggiuntive (Um > 72,5 kV):'
+  capacitances: Determinazione delle capacità avvolgimenti-terra e tra avvolgimenti
+  dc_insulation: Misura della resistenza di isolamento in c.c. tra ciascun avvolgimento e terra e tra avvolgimenti
+  tan_delta: Misura del fattore di dissipazione (tan δ) delle capacità del sistema di isolamento
+  dga: Misura dei gas disciolti nel liquido dielettrico di ciascuno scomparto olio
+  no_load_90_110: Misura delle perdite e della corrente a vuoto al 90 % e 110 % della tensione nominale
+  earthing_note: ' — solo per trasformatore di terra con avvolgimento secondario'
+accessories:
+  Isolatori MT in porcellana: Isolatori MT in porcellana
+  Isolatori BT1 in porcellana: Isolatori BT1 in porcellana
+  Isolatori BT2 in porcellana: Isolatori BT2 in porcellana
+  Isolatori BT3 in porcellana: Isolatori BT3 in porcellana
+  Commutatore a vuoto: Commutatore a vuoto
+  Targa dati: Targa dati
+  Ruote: Ruote
+  Valvola di scarico olio: Valvola di scarico olio
+  Valvola trattamento olio: Valvola trattamento olio
+  Valvole di campionamento: Valvole di campionamento
+  Essiccatore silica gel: Essiccatore silica gel
+  Valvole di sovrapressione con contatti: Valvole di sovrapressione con contatti
+  Schermo elettrostatico BT-MT: Schermo elettrostatico BT-MT
+  Indicatore di temperatura olio con contatti: Indicatore di temperatura olio con contatti
+  Indicatore di temperatura avvolgimenti con contatti: Indicatore di temperatura avvolgimenti con contatti
+  Indicatore di livello olio con contatti: Indicatore di livello olio con contatti
+  Relè Buchholz con contatti: Relè Buchholz con contatti
+  Supporti antivibranti: Supporti antivibranti
+  Punti fissi a sfera MT: Punti fissi a sfera MT
+  Punti fissi a sfera BT1: Punti fissi a sfera BT1
+  Punti fissi a sfera BT2: Punti fissi a sfera BT2
+  Punti fissi a sfera BT3: Punti fissi a sfera BT3
+  Cassetta centralizzazione ausiliari: Cassetta centralizzazione ausiliari
+  Sonda temperatura olio PT100: Sonda temperatura olio PT100
+  Scaricatori MT: Scaricatori MT
+  Box di protezione isolatori BT1: Box di protezione isolatori BT1
+  Box di protezione isolatori BT2: Box di protezione isolatori BT2
+  Box di protezione isolatori BT3: Box di protezione isolatori BT3
+  Kit ventilazione forzata: Kit ventilazione forzata
+  Cuscino separatore nel conservatore: Cuscino separatore nel conservatore
+  Analizzatore gas disciolti: Analizzatore gas disciolti

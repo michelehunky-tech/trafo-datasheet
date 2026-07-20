@@ -1,0 +1,162 @@
+# ================================================================
+# SPAGNOLO - bozza automatica DA VALIDARE dai tecnici madrelingua
+# Controllare in particolare: fields, values, tests (terminologia IEC)
+# ================================================================
+number_format:
+  decimal: ','
+  thousands: .
+ui:
+  doc_title: Ficha técnica
+  parameter: Parámetro
+  to_comply: 'Conforme a:'
+  overall: Dimensiones L × W × H
+  disclaimer: Dimensiones, pesos y accesorios son indicativos. No válidos para la construcción.
+  offer: Oferta
+  revision: rev.
+  client: Cliente
+  date: Fecha
+  pos: Pos.
+  project: Proyecto
+  cesi_suffix: type test nr. B4013916
+sections:
+  general: General
+  electrical: Características eléctricas
+  ratings: Datos nominales
+  environmental: Condiciones de servicio
+  dimensions: Dimensiones y peso
+  accessories: Accesorios
+  tests: Ensayos de rutina (IEC 60076-1)
+  notes: Notas
+fields:
+  Serie: Serie
+  Tipo casa: Construcción
+  Tipo sistema raffreddamento: Sistema de refrigeración
+  Raffreddamento: Refrigeración
+  Applicazione: Aplicación
+  THDi: THDi
+  Tipologia olio: Tipo de aceite
+  Classe amb / clim / fuoco: Clase ambiental / climática / fuego
+  Installazione: Instalación
+  Protezione superficiale: Protección superficial
+  Colore: Color
+  Numero fasi: Número de fases
+  Frequenza: Frecuencia
+  Gruppo vettoriale: Grupo de conexión
+  Perdite a vuoto: Pérdidas en vacío
+  Perdite a carico 75°C: Pérdidas en carga 75°C
+  Perdite a carico 120°C: Pérdidas en carga 120°C
+  Corrente a vuoto %: Corriente en vacío
+  Temp. Ambiente MIN: Temperatura ambiente mín.
+  Temp. Ambiente MAX: Temperatura ambiente máx.
+  Altitudine: Altitud máx. de instalación
+  Sovratemperatura olio: Calentamiento del aceite
+  LpA: Nivel de presión sonora (LpA)
+  LwA: Nivel de potencia sonora (LwA)
+  Lunghezza trafo: Longitud
+  Larghezza trafo: Anchura
+  Altezza trafo: Altura
+  Peso totale maggiorato: Peso total
+  Peso olio maggiorato: Peso del aceite
+  Interasse ruote: Distancia entre ruedas
+  Ø ruote: Diámetro de ruedas
+  Rated power: Potencia nominal
+  Voltage: Tensión
+  Connection: Conexión
+  Insulation level: Nivel de aislamiento
+  Winding material: Material del devanado
+  Winding type: Tipo de devanado
+  Thermal class: Clase térmica
+  Winding temp. rise: Calentamiento del devanado
+  Tap changer: Regulador
+  Tap positions (+/-): Posiciones (+/-)
+  Step per tap: Escalón por posición
+  Short-circuit impedance: Impedancia de cortocircuito
+  Efficiency index (PEI): Índice de eficiencia (PEI)
+  Efficiency index (MEPS/HEPS): Índice de eficiencia (MEPS/HEPS)
+  Efficiency index: Índice de eficiencia
+values:
+  Conservatore: Depósito de expansión
+  Ermetico: Hermético
+  Radiatori: Radiadores
+  Onde: Pared ondulada
+  Scambiatore: Intercambiador de calor
+  Reg. sottocarico: Regulador en carga (OLTC)
+  A vuoto: Regulador sin tensión (DETC)
+  Reg. a vuoto: Regulador sin tensión (DETC)
+  Nessuno: Ninguno
+  Distribuzione: Distribución
+  Conversione: Conversión
+  Trasmissione: Transporte
+  Trazione: Tracción
+  Fotovoltaico: Fotovoltaica
+  Eolico: Eólica
+  Interno / Esterno: Interior / Exterior
+  Interno: Interior
+  Esterno: Exterior
+  Al: Aluminio
+  Cu: Cobre
+  Strati: Capas
+  Dischi: Discos
+  Disco: Discos
+  Continuo: Discos continuos
+  Elicoidale: Helicoidal
+  Bobine: Bobinas
+  Inglobata: Encapsulado
+  Impregnata: Impregnado
+tests:
+  header: 'Ensayos de rutina IEC 60076-1:'
+  winding_resistance: Medida de la resistencia de los devanados
+  voltage_ratio: Medida de la relación de transformación y verificación del desfase
+  sc_impedance_load_loss: Medida de la impedancia de cortocircuito y de las pérdidas en carga
+  no_load_loss: Medida de las pérdidas y de la corriente en vacío
+  dielectric_header: 'Ensayos dieléctricos de rutina:'
+  av: Ensayo de tensión aplicada (AV)
+  ivw: Ensayo de tensión inducida de soportabilidad (IVW)
+  ivpd: Ensayo de tensión inducida con medida de descargas parciales (IVPD)
+  auxw: Ensayo de aislamiento del cableado auxiliar (AuxW) — solo si está presente
+  li: Ensayo de impulso tipo rayo a onda plena en los terminales de línea (LI)
+  ltac: Ensayo de tensión aplicada en los terminales de línea (LTAC) — solo para aislamiento no uniforme
+  oltc: Ensayos del regulador en carga, cuando proceda
+  tightness: Ensayo de estanqueidad con presión para transformadores en aceite (tightness test)
+  ct_check: Verificación de la relación y polaridad de los TC incorporados — solo si están presentes
+  core_frame: Verificación del aislamiento del núcleo y la estructura para transformadores en aceite con aislamiento de núcleo o estructura
+  zero_sequence: Medida de la impedancia homopolar
+  um_header: 'Ensayos de rutina adicionales (Um > 72,5 kV):'
+  capacitances: Determinación de las capacidades devanados-tierra y entre devanados
+  dc_insulation: Medida de la resistencia de aislamiento en c.c. entre cada devanado y tierra y entre devanados
+  tan_delta: Medida del factor de disipación (tan δ) de las capacidades del sistema de aislamiento
+  dga: Medida de los gases disueltos en el líquido dieléctrico de cada compartimento de aceite
+  no_load_90_110: Medida de las pérdidas y de la corriente en vacío al 90 % y 110 % de la tensión nominal
+  earthing_note: ' — solo para transformador de puesta a tierra con devanado secundario'
+accessories:
+  Isolatori MT in porcellana: Aisladores MV de porcelana
+  Isolatori BT1 in porcellana: Aisladores LV1 de porcelana
+  Isolatori BT2 in porcellana: Aisladores LV2 de porcelana
+  Isolatori BT3 in porcellana: Aisladores LV3 de porcelana
+  Commutatore a vuoto: Regulador sin tensión
+  Targa dati: Placa de características
+  Ruote: Ruedas
+  Valvola di scarico olio: Válvula de vaciado de aceite
+  Valvola trattamento olio: Válvula de tratamiento de aceite
+  Valvole di campionamento: Válvulas de muestreo
+  Essiccatore silica gel: Desecador de gel de sílice
+  Valvole di sovrapressione con contatti: Válvulas de sobrepresión con contactos
+  Schermo elettrostatico BT-MT: Pantalla electrostática LV-MV
+  Indicatore di temperatura olio con contatti: Indicador de temperatura de aceite con contactos
+  Indicatore di temperatura avvolgimenti con contatti: Indicador de temperatura de devanados con contactos
+  Indicatore di livello olio con contatti: Indicador de nivel de aceite con contactos
+  Relè Buchholz con contatti: Relé Buchholz con contactos
+  Supporti antivibranti: Soportes antivibratorios
+  Punti fissi a sfera MT: Puntos fijos de rótula MV
+  Punti fissi a sfera BT1: Puntos fijos de rótula LV1
+  Punti fissi a sfera BT2: Puntos fijos de rótula LV2
+  Punti fissi a sfera BT3: Puntos fijos de rótula LV3
+  Cassetta centralizzazione ausiliari: Caja de centralización de auxiliares
+  Sonda temperatura olio PT100: Sonda de temperatura de aceite PT100
+  Scaricatori MT: Pararrayos MV
+  Box di protezione isolatori BT1: Caja de protección de aisladores LV1
+  Box di protezione isolatori BT2: Caja de protección de aisladores LV2
+  Box di protezione isolatori BT3: Caja de protección de aisladores LV3
+  Kit ventilazione forzata: Kit de ventilación forzada
+  Cuscino separatore nel conservatore: Membrana separadora en el depósito
+  Analizzatore gas disciolti: Analizador de gases disueltos
