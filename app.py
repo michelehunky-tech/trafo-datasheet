@@ -78,20 +78,15 @@ def pdf_dialog():
                        mime="application/pdf", use_container_width=True)
     if st.button("Chiudi", use_container_width=True, key="__close_dialog"):
         st.session_state.pop("pdf_ready", None)
-        st.rerun()
 
 
 def header():
-    """Logo a sinistra; a destra: Nuova scheda · icona tema · logout."""
+    """Logo a sinistra; a destra: icona tema · logout."""
     current = st.session_state.get("theme", "light")
-    c_logo, c_new, c_theme, c_out = st.columns([6, 1.6, 0.7, 0.7])
+    c_logo, c_theme, c_out = st.columns([8, 0.7, 0.7])
     with c_logo:
         st.markdown(f'<div class="te-brand">{logo_img_tag(height="34px")}</div>',
                     unsafe_allow_html=True)
-    with c_new:
-        if st.button("＋ Nuova scheda", key="__new", use_container_width=True):
-            reset_all()
-            st.rerun()
     with c_theme:
         st.markdown('<div class="te-iconbtn">', unsafe_allow_html=True)
         icon = "🌙" if current == "light" else "☀️"
