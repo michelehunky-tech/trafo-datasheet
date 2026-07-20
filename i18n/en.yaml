@@ -4,7 +4,7 @@ number_format:
 ui:
   doc_title: Technical Datasheet
   parameter: Parameter
-  to_comply: 'To Comply with:'
+  to_comply: 'Comply with:'
   overall: Overall L × W × H
   disclaimer: Dimensions, weights and accessories are indicative only. Not for construction.
   offer: Offer

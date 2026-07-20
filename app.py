@@ -177,6 +177,12 @@ def main():
         "pos": c3.text_input("Pos.", ""),
     }
 
+    LANGS = {"English": "en", "Italiano": "it", "Français": "fr", "Deutsch": "de", "Español": "es"}
+    lang_label = st.radio("Lingua scheda tecnica", list(LANGS.keys()),
+                          index=0, horizontal=True)
+    lang_code = LANGS[lang_label]
+    st.session_state["lang_code"] = lang_code
+
     answers = st.session_state.get("answers", {})
     omitted = set(st.session_state.get("omitted", []))
 
@@ -293,10 +299,7 @@ def main():
 
     notes = st.text_area("Notes (facoltative)", st.session_state.get("notes", ""))
 
-    LANGS = {"Italiano": "it", "English": "en", "Français": "fr", "Deutsch": "de", "Español": "es"}
-    lang_label = st.selectbox("Lingua scheda tecnica", list(LANGS.keys()), index=1)
-    lang_code = LANGS[lang_label]
-
+    lang_code = st.session_state.get("lang_code", "en")
     if st.button("Genera PDF", type="primary"):
         with st.spinner("Generazione della scheda tecnica in corso…"):
             from parser.extract import load_lang, translate_accessory
