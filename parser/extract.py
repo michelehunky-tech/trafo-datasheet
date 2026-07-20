@@ -207,6 +207,10 @@ def build_fields(raw, family, schema):
         # text translation (only for mapped fields)
         translated, ok = translate(fld["it"], raw_v, schema)
         display = translated if translated is not None else format_value(raw_v, fld, nf)
+        if fld["it"] == "Colore" and not is_blank(raw_v):
+            lg = schema.get("lang")
+            if lg and lg.get("color_terms"):
+                display = translate_color(raw_v, lg["color_terms"])
         out.append({
             "it": fld["it"], "en": _label(schema, fld["it"], fld["en"]),
             "section": fld["section"],
@@ -632,3 +636,19 @@ def translate_accessory(text, gloss):
         return text  # nessuna corrispondenza: lascia invariato
     rest = body[len(best):]  # parametri finali (kV, A, ...)
     return f"{prefix}{gloss[best]}{rest}"
+
+
+def translate_color(text, color_gloss):
+    """Traduce la descrizione del colore. Se il valore è solo un codice RAL
+    (es. 'RAL 7030') lo lascia invariato; altrimenti sostituisce i termini noti
+    mantenendo i codici RAL e i numeri."""
+    import re
+    s = str(text).strip()
+    if not s:
+        return text
+    if re.match(r"^RAL\s*\d+\w*$", s, flags=re.IGNORECASE):
+        return text  # solo RAL: non tradurre
+    out = s
+    for term in sorted(color_gloss, key=len, reverse=True):
+        out = re.sub(re.escape(term), color_gloss[term], out, flags=re.IGNORECASE)
+    return out
