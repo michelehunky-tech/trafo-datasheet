@@ -70,8 +70,9 @@ body{margin:0;}
 .herofig .dimcap .meas{font-size:9pt; font-weight:600; color:var(--ink);
   display:flex; align-items:center; justify-content:center; gap:6px;}
 .herofig .dimcap .axesicon{height:5mm; width:auto; opacity:.75;}
-.complied{margin:6px 0 0; font-size:8pt; color:var(--ink-soft); text-align:center;}
-.complied span{font-weight:600; color:var(--ink); text-transform:uppercase; letter-spacing:.06em; font-size:7pt;}
+.complied{margin:6px 0 0; font-size:10pt; color:var(--ink); text-align:center; font-weight:600;
+  background:var(--accent); padding:6px 12px; border-radius:3px;}
+.complied span{font-weight:700; text-transform:uppercase; letter-spacing:.06em; font-size:8.5pt; margin-right:6px;}
 
 /* ---- section header: bold word + thin rule, no diagonal tick ---- */
 .section{margin-top:15px; page-break-inside:avoid;}

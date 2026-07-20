@@ -186,15 +186,19 @@ def grouped_sections(fields):
 # --- multi-winding configuration ---
 WINDINGS = [
     ("MT",  {"V": "Tensione MT", "V2": "Tensione MT2", "P": "Potenza nominale MT",
+             "Pf": "Potenza reg. forzato MT",
              "conn": "Collegamento MT", "ins": "Classe isolamento MT", "mat": "Materiale MT",
              "wt": "Tipo avvolg. MT", "tc": "Classe termica MT", "tr": "Sovratemperatura avvolg. MT"}),
     ("BT1", {"V": "Tensione BT1", "P": "Potenza nominale BT1",
+             "Pf": "Potenza reg. forzato BT1",
              "conn": "Collegamento BT1", "ins": "Classe isolamento BT1", "mat": "Materiale BT1",
              "wt": "Tipo avvolg. BT1", "tc": "Classe termica BT1", "tr": "Sovratemperatura avvolg. BT1"}),
     ("BT2", {"V": "Tensione BT2", "P": "Potenza nominale BT2",
+             "Pf": "Potenza reg. forzato BT2",
              "conn": "Collegamento BT2", "ins": "Classe isolamento BT2", "mat": "Materiale BT2",
              "wt": "Tipo avvolg. BT2", "tc": "Classe termica BT2", "tr": "Sovratemperatura avvolg. BT2"}),
     ("BT3", {"V": "Tensione BT3", "P": "Potenza nominale BT3",
+             "Pf": "Potenza reg. forzato BT3",
              "conn": "Collegamento BT3", "ins": "Classe isolamento BT3", "mat": "Materiale BT3",
              "wt": "Tipo avvolg. BT3", "tc": "Classe termica BT3", "tr": "Sovratemperatura avvolg. BT3"}),
 ]
@@ -289,6 +293,11 @@ def build_ratings(raw, schema):
                 val = format_value(raw_v, {"decimals": dec}, nf)
             else:
                 val = get_display(m[key], raw, schema)
+            if key == "P":
+                pf = raw.get(m.get("Pf"))
+                if not is_blank(pf) and _f(pf) not in (None, 0):
+                    val = (f"{format_value(raw_v, {'decimals':0}, nf)}/"
+                           f"{format_value(pf, {'decimals':0}, nf)}")
             if key == "V" and w["role"] == "MT":            # doppia tensione MT: min / max
                 v1, v2 = _f(raw.get(m["V"])), _f(raw.get(m.get("V2")))
                 if v1 and v2 and v2 != 0:
@@ -515,9 +524,16 @@ def parse(xlsx_path, schema=None, overrides=None):
     eff = efficiency_row(raw, schema)
     sci = short_circuit_row(raw, schema)
     wtr = winding_temp_row(raw, schema, windings)
-    for extra in (eff, wtr):
-        if extra:
-            fields.append(extra)
+    if eff:
+        fields.append(eff)
+    if wtr:
+        # inserisci wtr subito dopo "Sovratemperatura olio" (posizione layout)
+        insert_at = len(fields)
+        for i, f in enumerate(fields):
+            if f["it"] == "Sovratemperatura olio":
+                insert_at = i + 1
+                break
+        fields.insert(insert_at, wtr)
 
     return {
         "raw": raw,

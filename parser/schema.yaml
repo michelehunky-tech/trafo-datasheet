@@ -112,6 +112,14 @@ fields:
   family: both
   include_in_sheet: true
   required: false
+- it: THDi
+  en: THDi
+  section: general
+  family: both
+  include_in_sheet: true
+  required: false
+  unit: '%'
+  decimals: 1
 - it: Tipologia olio
   en: Oil type
   section: general
@@ -142,14 +150,6 @@ fields:
   family: both
   include_in_sheet: true
   required: false
-- it: THDi
-  en: THDi
-  section: general
-  family: both
-  include_in_sheet: true
-  required: false
-  unit: '%'
-  decimals: 1
 - it: Numero fasi
   en: Number of phases
   section: electrical
