@@ -7,17 +7,20 @@
 {% macro grid(sec) %}
 {% if sec %}
 {% set ns.n = ns.n + 1 %}
+{% set gs = namespace(col=0) %}
 <div class="section">
   <div class="sechead"><span class="num">{{ ns.n }}</span><h2>{{ sec.title }}</h2><span class="ln"></span></div>
   <table class="grid3"><tr>
   {% for r in sec.rows %}
+    {% if r.newrow and gs.col > 0 %}{% for i in range(3 - gs.col) %}<td style="width:33.33%"></td>{% endfor %}</tr><tr>{% set gs.col = 0 %}{% endif %}
     <td style="width:33.33%">
       <div class="cell">
         <span class="k{% if r.en == 'THDi' %} raw{% endif %}">{{ r.en }}</span>
         <span class="v">{{ r.value }}{% if r.unit %} <span class="u">{{ r.unit }}</span>{% endif %}</span>
       </div>
     </td>
-    {% if loop.index % 3 == 0 and not loop.last %}</tr><tr>{% endif %}
+    {% set gs.col = gs.col + 1 %}
+    {% if gs.col == 3 and not loop.last %}</tr><tr>{% set gs.col = 0 %}{% endif %}
   {% endfor %}
   </tr></table>
 </div>
@@ -41,7 +44,8 @@
 <table class="herowrap"><tr>
   <td class="herotitle">
     <h1>{{ designation_main }}</h1>
-    <p class="sub">{{ designation_voltage }}{% if designation_series %} &nbsp;—&nbsp; {{ designation_series }}{% endif %}</p>
+    <p class="sub">{{ designation_voltage }}</p>
+    {% if designation_series %}<p class="sub series">{{ designation_series }}</p>{% endif %}
     {% if meta.offer %}<span class="badge">{{ ui.offer }} {{ meta.offer }}{% if meta.revision %} {{ ui.revision }}{{ meta.revision }}{% endif %}</span>{% endif %}
   </td>
   <td class="herologos">
@@ -129,7 +133,7 @@
 {% if notes %}
 <div class="section notes">
   <div class="sechead"><span class="num">N</span><h2>{{ sections_ui.notes }}</h2><span class="ln"></span></div>
-  <p>{{ notes }}</p>
+  <p style="white-space:pre-line;">{{ notes }}</p>
 </div>
 {% endif %}
 

@@ -316,7 +316,14 @@ def main():
                               accessories=acc_out, tests=tests_out)
             with open(out.name, "rb") as f:
                 pdf_bytes = f.read()
-        fname = f"datasheet_{(meta['client'] or 'trafo').replace(' ', '_')}_{lang_code}.pdf"
+        def _sanitize(x):
+            return "".join(c for c in str(x or "").strip() if c.isalnum() or c in "-_").strip("-_")
+        offer_rev = _sanitize(meta.get("offer"))
+        if meta.get("revision"):
+            offer_rev = f"{offer_rev}-{_sanitize(meta['revision'])}"
+        parts = [p for p in [offer_rev, _sanitize(meta.get("pos")),
+                             _sanitize(meta.get("client")), "TD"] if p]
+        fname = "_".join(parts) + ".pdf" if parts else "datasheet_TD.pdf"
         st.session_state["pdf_ready"] = (pdf_bytes, fname)
         pdf_dialog()
 

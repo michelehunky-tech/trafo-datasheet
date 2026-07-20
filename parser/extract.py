@@ -211,12 +211,25 @@ def build_fields(raw, family, schema):
             lg = schema.get("lang")
             if lg and lg.get("color_terms"):
                 display = translate_color(raw_v, lg["color_terms"])
-        out.append({
+        blank = is_blank(raw_v)
+        # Application forzata a "Earthing transformer" se trasformatore di terra
+        if fld["it"] == "Applicazione" and is_earthing(raw):
+            lg = schema.get("lang")
+            et = (lg["values"] if lg else {}).get("Trasformatore di terra", "Earthing transformer")
+            display, ok, blank = et, True, False
+        # Load losses = 0 -> ometti il campo
+        if fld["it"] in ("Perdite a carico 75°C", "Perdite a carico 120°C"):
+            if _f(raw_v) in (0, None):
+                blank = True
+        row = {
             "it": fld["it"], "en": _label(schema, fld["it"], fld["en"]),
             "section": fld["section"],
             "unit": fld.get("unit"), "value": display,
-            "blank": is_blank(raw_v), "translated_ok": ok,
-        })
+            "blank": blank, "translated_ok": ok,
+        }
+        if fld["it"] == "LpA":
+            row["newrow"] = True   # LpA/LwA su riga nuova
+        out.append(row)
     return out
 
 
@@ -345,7 +358,8 @@ def build_ratings(raw, schema):
                 val = get_display(m[key], raw, schema)
             if key == "P":
                 pf = raw.get(m.get("Pf"))
-                if not is_blank(pf) and _f(pf) not in (None, 0):
+                pfv, pv = _f(pf), _f(raw_v)
+                if pfv not in (None, 0) and pfv != pv:
                     val = (f"{format_value(raw_v, {'decimals':0}, nf)}/"
                            f"{format_value(pf, {'decimals':0}, nf)}")
             if key == "V" and w["role"] == "MT":            # doppia tensione MT: min / max
@@ -390,12 +404,12 @@ def short_circuit_row(raw, schema):
         for key, w1, w2 in IMPEDANCES:
             if w1 in rolelabel and w2 in rolelabel:
                 v = _imp(raw.get(key), nf)
-                if v is not None:
+                if v is not None and _f(raw.get(key)) != 0:
                     parts.append(f"{rolelabel[w1]}–{rolelabel[w2]}: {v}%")
     else:
-        v = (_imp(raw.get("Impedenza di cortocircuito % Totale"), nf)
-             or _imp(raw.get("Impedenza di cortocircuito % MT-BT1"), nf))
-        if v is not None:
+        raw_sc = raw.get("Impedenza di cortocircuito % Totale") or raw.get("Impedenza di cortocircuito % MT-BT1")
+        v = _imp(raw_sc, nf)
+        if v is not None and _f(raw_sc) != 0:
             if "MT" in rolelabel and "BT1" in rolelabel:
                 parts.append(f"{rolelabel['MT']}–{rolelabel['BT1']}: {v}%")
             else:
@@ -543,7 +557,17 @@ def designation_parts(raw, schema):
     nf = _nf(schema)
     serie = str(raw.get("Serie") or "").strip()
     power = raw.get("Potenza nominale MT")
-    main = f"{format_value(power, {'decimals':0}, nf)} kVA" if not is_blank(power) else (serie or "Transformer")
+    pf = raw.get("Potenza reg. forzato MT")
+    if not is_blank(power):
+        p, pforced = _f(power), _f(pf)
+        if pforced not in (None, 0) and pforced != p:      # doppia potenza: min-max
+            lo, hi = sorted([p, pforced])
+            main = (f"{format_value(lo, {'decimals':0}, nf)}-"
+                    f"{format_value(hi, {'decimals':0}, nf)} kVA")
+        else:
+            main = f"{format_value(power, {'decimals':0}, nf)} kVA"
+    else:
+        main = serie or "Transformer"
 
     def side(keys, sort=False):
         vals = []

@@ -4,7 +4,7 @@ number_format:
 ui:
   doc_title: Technical Datasheet
   parameter: Parameter
-  to_comply: 'Comply with:'
+  to_comply: 'To Comply with:'
   overall: Overall L × W × H
   disclaimer: Dimensions, weights and accessories are indicative only. Not for construction.
   offer: Offer
@@ -99,6 +99,7 @@ values:
   Bobine: Coil
   Inglobata: Cast (encapsulated)
   Impregnata: Impregnated
+  Trasformatore di terra: Earthing transformer
 tests:
   header: 'Routine tests IEC 60076-1:'
   winding_resistance: Measurement of winding resistance

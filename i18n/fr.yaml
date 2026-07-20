@@ -103,6 +103,7 @@ values:
   Bobine: Bobines
   Inglobata: Enrobé
   Impregnata: Imprégné
+  Trasformatore di terra: Transformateur de mise à la terre
 tests:
   header: 'Essais de routine IEC 60076-1 :'
   winding_resistance: Mesure de la résistance des enroulements

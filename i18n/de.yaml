@@ -103,6 +103,7 @@ values:
   Bobine: Spulen
   Inglobata: Vergossen
   Impregnata: Imprägniert
+  Trasformatore di terra: Erdungstransformator
 tests:
   header: 'Stückprüfungen IEC 60076-1:'
   winding_resistance: Messung des Wicklungswiderstands

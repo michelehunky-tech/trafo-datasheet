@@ -103,6 +103,7 @@ values:
   Bobine: Bobinas
   Inglobata: Encapsulado
   Impregnata: Impregnado
+  Trasformatore di terra: Transformador de puesta a tierra
 tests:
   header: 'Ensayos de rutina IEC 60076-1:'
   winding_resistance: Medida de la resistencia de los devanados

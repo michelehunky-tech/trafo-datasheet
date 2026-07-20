@@ -99,6 +99,7 @@ values:
   Bobine: Bobine
   Inglobata: Inglobato
   Impregnata: Impregnato
+  Trasformatore di terra: Trasformatore di terra
 tests:
   header: 'Prove di routine IEC 60076-1:'
   winding_resistance: Misura della resistenza degli avvolgimenti
