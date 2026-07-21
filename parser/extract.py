@@ -131,38 +131,69 @@ def _winding_pair(windings):
 
 
 def select_image(raw, family, schema):
-    """Compone il nome file dai dati; ricade sui generici / fallback se la combo
-    esatta non esiste tra le immagini. Restituisce la chiave (senza .png)."""
+    """Assegna l'immagine trasformatore secondo la regola concordata.
+    Priorità: resina → earthing → olio doppio secondario → olio singolo secondario.
+    Ricade sui fallback previsti se la combinazione esatta non esiste."""
     windings = build_windings(raw, schema)
+    secondaries = windings[1:]                    # tutti gli avvolgimenti dopo il primario
+    n_sec = len(secondaries)
+    has_bt = any(w["base"] == "LV" for w in secondaries)
     earthing = is_earthing(raw)
     casa = str(raw.get("Tipo casa") or "").strip().lower()
     cooling = str(raw.get("Tipo sistema raffreddamento") or "").strip().lower()
     oltc = "sottocarico" in str(raw.get("Tipo commutatore") or "").lower()
+    ermetico = "ermetico" in casa
+    radiatori = "radiatori" in cooling
+    scambiatore = "scambiatore" in cooling
+    p_mt = _f(raw.get("Potenza nominale MT"))
 
     cand = []
+
+    # 1) RESINA (ma earthing ha priorità: gestito sotto)
     if earthing:
         if family == "resina":
             cand.append("Earthing_resina")
         else:
-            cassa = "ermetico" if "ermetico" in casa else "conservatore"
-            has_bt = any(w["base"] == "LV" for w in windings[1:])  # secondario in bassa tensione
+            cassa = "ermetico" if ermetico else "conservatore"
             if has_bt:
                 cand.append(f"Earthing_{cassa}_avvolgimento_BT")
             cand.append(f"Earthing_{cassa}")
         cand.append("Earthing_resina")
+
     elif family == "resina":
         cand.append("Trasformatore_resina")
-    else:  # olio
-        if "conservatore" in casa and "radiatori" in cooling:
+
+    # 2) OLIO, DOPPIO SECONDARIO (>=2 secondari): solo cassa+raffreddamento
+    elif n_sec >= 2:
+        if ermetico:
+            cand.append("Trasformatore_in_olio_ermetico_DOPPIO_SECONDARIO")
+        elif scambiatore:
+            cand.append("Trasformatore_in_olio_conservatore_e_scambiatore_OFWF_DOPPIO_SECONDARIO")
+        elif radiatori:
+            cand.append("Trasformatore_in_olio_conservatore_radiatori_DOPPIO_SECONDARIO")
+        else:  # conservatore onde / generico
+            cand.append("Trasformatore_in_olio_conservatore_DOPPIO_SECONDARIO")
+        cand.append("Trasformatore_in_olio_conservatore_DOPPIO_SECONDARIO")
+
+    # 3) OLIO, SINGOLO SECONDARIO
+    else:
+        if scambiatore:
+            cand.append("Trasformatore_in_olio_conservatore_e_scambiatore_OFWF")
+        elif radiatori and not ermetico:
             sig = _winding_pair(windings)
             comm = "OLTC" if oltc else "a_vuoto"
-            cand.append(f"Conservatore_radiatori_{sig}_commutatore_{comm}")
-            cand.append("Conservatore_radiatori_MV-MV_commutatore_a_vuoto")  # fallback casi speciali
-        elif "conservatore" in casa:
-            cand.append("Conservatore_onde")
-        elif "ermetico" in casa:
+            if sig == "MV-LV" and not oltc and p_mt is not None and p_mt < 3150:
+                cand.append("Trasformatore_in_olio_Conservatore_radiatori_MV-LV_"
+                            "commutatore_a_vuoto_per_potenze_ridotte_Potenza_minore_di_3150_kVA")
+            elif sig in ("HV-MV", "MV-MV"):
+                cand.append(f"Trasformatore_in_olio_Conservatore_radiatori_{sig}_commutatore_{comm}")
+            # fallback radiatori: MV-MV a vuoto
+            cand.append("Trasformatore_in_olio_Conservatore_radiatori_MV-MV_commutatore_a_vuoto")
+        elif ermetico:
             cand.append("Ermetico_onde")
-        cand.append("Conservatore_onde")  # fallback generico olio
+        else:  # conservatore onde
+            cand.append("Trasformatore_in_olio_Conservatore_onde")
+        cand.append("Trasformatore_in_olio_Conservatore_onde")
 
     for c in cand:
         if _img_exists(c):
