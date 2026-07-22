@@ -702,11 +702,12 @@ def parse(xlsx_path, schema=None, overrides=None, lang_code="en"):
     for er in earthing_rows(raw, schema):   # Zo/Ro/Xo + fault current (solo earthing)
         fields.append(er)
     if wtr:
-        # inserisci wtr subito dopo "Sovratemperatura olio" (posizione layout)
+        # inserisci winding temp rise appena PRIMA di LpA, così LpA/LwA
+        # restano gli ultimi due e cadono su una riga propria
         insert_at = len(fields)
         for i, f in enumerate(fields):
-            if f["it"] == "Sovratemperatura olio":
-                insert_at = i + 1
+            if f["it"] == "LpA":
+                insert_at = i
                 break
         fields.insert(insert_at, wtr)
 
