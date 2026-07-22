@@ -68,9 +68,9 @@ body{margin:0;}
 .herofig .figimg{display:block; height:78mm; width:auto; max-width:80%; margin:0 auto;}
 .herofig .dimcap{margin-top:8px; text-align:center;}
 .herofig .dimcap .lbl{font-size:6.5pt; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:3px;}
-.herofig .dimcap .meas{font-size:9pt; font-weight:600; color:var(--ink);
-  display:flex; align-items:center; justify-content:center; gap:6px;}
-.herofig .dimcap .axesicon{height:5mm; width:auto; opacity:.75;}
+.herofig .dimcap .meas{font-size:9pt; font-weight:600; color:var(--ink); text-align:center;}
+.herofig .dimcap .axesicon{height:5mm; width:5mm; opacity:.75; vertical-align:middle; margin-right:6px;}
+.herofig .dimcap .meas span{vertical-align:middle;}
 .complied{margin:6px 0 0; font-size:10pt; color:var(--ink); text-align:center; font-weight:600;
   background:var(--accent); padding:6px 12px; border-radius:3px;}
 .complied span{font-weight:700; text-transform:uppercase; letter-spacing:.06em; font-size:8.5pt; margin-right:6px;}
