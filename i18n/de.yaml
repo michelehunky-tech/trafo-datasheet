@@ -18,6 +18,8 @@ ui:
   pos: Pos.
   project: Projekt
   cesi_suffix: type test nr. B4013916
+  cont: cont.
+  ip_note: Schutzart {ip} durch das Schutzgehäuse gewährleistet.
 sections:
   general: Allgemein
   electrical: Elektrische Kenndaten
@@ -74,6 +76,10 @@ fields:
   Efficiency index (PEI): Effizienzindex (PEI)
   Efficiency index (MEPS/HEPS): Effizienzindex (MEPS/HEPS)
   Efficiency index: Effizienzindex
+  Zo: Zo
+  Ro: Ro
+  Xo: Xo
+  Neutral zero-sequence fault current: Nullsystem-Fehlerstrom am Neutralpunkt
 values:
   Conservatore: Ausdehnungsgefäß
   Ermetico: Hermetisch
@@ -129,6 +135,7 @@ tests:
   dga: Messung der gelösten Gase in der Isolierflüssigkeit jedes Ölraums
   no_load_90_110: Messung der Leerlaufverluste und des Leerlaufstroms bei 90 % und 110 % der Bemessungsspannung
   earthing_note: ' — nur für Erdungstransformator mit Sekundärwicklung'
+  pd_measurement: Teilentladungsmessung
 accessories:
   Isolatori MT in porcellana: MV-Porzellandurchführungen
   Isolatori BT1 in porcellana: LV1-Porzellandurchführungen
@@ -172,3 +179,5 @@ color_terms:
   Coperchio: Deckel
   grezzo: blank
   Radiatori: Radiatoren
+uom:
+  ohm_phase: Ohm/Phase

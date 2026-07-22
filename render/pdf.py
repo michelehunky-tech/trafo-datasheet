@@ -74,6 +74,7 @@ def render_pdf_modern(parsed, meta, notes, out_path, accessories=None, tests=Non
         cesi=parsed.get("cesi"),
         standards=parsed.get("standards"),
         short_circuit=parsed.get("short_circuit"),
+        ip_note=parsed.get("ip_note"),
         accessories=acc,
         tests=tst,
         notes=notes,

@@ -18,6 +18,8 @@ ui:
   pos: Pos.
   project: Projet
   cesi_suffix: type test nr. B4013916
+  cont: cont.
+  ip_note: Degré de protection {ip} assuré par le coffret de protection.
 sections:
   general: Général
   electrical: Caractéristiques électriques
@@ -74,6 +76,10 @@ fields:
   Efficiency index (PEI): Indice d'efficacité (PEI)
   Efficiency index (MEPS/HEPS): Indice d'efficacité (MEPS/HEPS)
   Efficiency index: Indice d'efficacité
+  Zo: Zo
+  Ro: Ro
+  Xo: Xo
+  Neutral zero-sequence fault current: Courant de défaut homopolaire au neutre
 values:
   Conservatore: Conservateur
   Ermetico: Hermétique
@@ -129,6 +135,7 @@ tests:
   dga: Mesure des gaz dissous dans le liquide diélectrique de chaque compartiment d'huile
   no_load_90_110: Mesure des pertes et du courant à vide à 90 % et 110 % de la tension nominale
   earthing_note: ' — uniquement pour transformateur de mise à la terre avec enroulement secondaire'
+  pd_measurement: Mesure des décharges partielles
 accessories:
   Isolatori MT in porcellana: Isolateurs MV en porcelaine
   Isolatori BT1 in porcellana: Isolateurs LV1 en porcelaine
@@ -172,3 +179,5 @@ color_terms:
   Coperchio: Couvercle
   grezzo: brut
   Radiatori: Radiateurs
+uom:
+  ohm_phase: ohm/phase

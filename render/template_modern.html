@@ -130,10 +130,11 @@
 </div>
 {% endif %}
 
-{% if notes %}
+{% if notes or ip_note %}
 <div class="section notes">
   <div class="sechead"><span class="num">N</span><h2>{{ sections_ui.notes }}</h2><span class="ln"></span></div>
-  <p style="white-space:pre-line;">{{ notes }}</p>
+  {% if ip_note %}<p style="margin:0 0 4px;">{{ ip_note }}</p>{% endif %}
+  {% if notes %}<p style="white-space:pre-line; margin:0;">{{ notes }}</p>{% endif %}
 </div>
 {% endif %}
 

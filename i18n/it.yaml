@@ -14,6 +14,8 @@ ui:
   pos: Pos.
   project: Progetto
   cesi_suffix: type test nr. B4013916
+  cont: cont.
+  ip_note: Grado di protezione {ip} garantito dal box di protezione.
 sections:
   general: Generale
   electrical: Caratteristiche elettriche
@@ -70,6 +72,10 @@ fields:
   Efficiency index (PEI): Indice di efficienza (PEI)
   Efficiency index (MEPS/HEPS): Indice di efficienza (MEPS/HEPS)
   Efficiency index: Indice di efficienza
+  Zo: Zo
+  Ro: Ro
+  Xo: Xo
+  Neutral zero-sequence fault current: Corrente di guasto omopolare al neutro
 values:
   Conservatore: Conservatore
   Ermetico: Ermetico
@@ -125,6 +131,7 @@ tests:
   dga: Misura dei gas disciolti nel liquido dielettrico di ciascuno scomparto olio
   no_load_90_110: Misura delle perdite e della corrente a vuoto al 90 % e 110 % della tensione nominale
   earthing_note: ' — solo per trasformatore di terra con avvolgimento secondario'
+  pd_measurement: Misura delle scariche parziali
 accessories:
   Isolatori MT in porcellana: Isolatori MT in porcellana
   Isolatori BT1 in porcellana: Isolatori BT1 in porcellana
@@ -168,3 +175,5 @@ color_terms:
   Coperchio: Coperchio
   grezzo: grezzo
   Radiatori: Radiatori
+uom:
+  ohm_phase: ohm/fase

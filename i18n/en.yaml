@@ -14,6 +14,8 @@ ui:
   pos: Pos.
   project: Project
   cesi_suffix: type test nr. B4013916
+  cont: cont.
+  ip_note: Protection degree {ip} provided by the protection box.
 sections:
   general: General
   electrical: Electrical
@@ -70,6 +72,10 @@ fields:
   Efficiency index (PEI): Efficiency index (PEI)
   Efficiency index (MEPS/HEPS): Efficiency index (MEPS/HEPS)
   Efficiency index: Efficiency index
+  Zo: Zo
+  Ro: Ro
+  Xo: Xo
+  Neutral zero-sequence fault current: Neutral zero-sequence fault current
 values:
   Conservatore: Conservator
   Ermetico: Hermetically sealed
@@ -125,6 +131,7 @@ tests:
   dga: Measurement of dissolved gases in dielectric liquid from each oil compartment
   no_load_90_110: Measurement of no-load loss and current at 90 % and 110 % of rated voltage
   earthing_note: ' — only for earthing transformer with secondary winding'
+  pd_measurement: Partial discharge measurement
 accessories:
   Isolatori MT in porcellana: MV porcelain insulators
   Isolatori BT1 in porcellana: LV1 porcelain insulators
@@ -168,3 +175,5 @@ color_terms:
   Coperchio: Cover
   grezzo: bare
   Radiatori: Radiators
+uom:
+  ohm_phase: ohm/phase

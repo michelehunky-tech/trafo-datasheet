@@ -465,10 +465,68 @@ def winding_temp_row(raw, schema, windings):
             "value": " / ".join(vals), "blank": False, "translated_ok": True}
 
 
-def standards_text(raw):
+def standards_text(raw, family=None):
     xs = [str(raw.get(f"Norma {i} / Regol. {i}")).strip()
           for i in range(1, 5) if not is_blank(raw.get(f"Norma {i} / Regol. {i}"))]
+    # IEC 60076 generico -> famiglia-specifico: -11 resina, -1 olio
+    if family in ("resina", "olio"):
+        suffix = "11" if family == "resina" else "1"
+        xs = [f"IEC 60076-{suffix}" if x.replace(" ", "").upper() == "IEC60076" else x for x in xs]
     return " · ".join(xs) if xs else None
+
+
+def earthing_rows(raw, schema):
+    """Righe elettriche aggiuntive per i trasformatori di terra (earthing):
+    Zo/Ro/Xo in ohm/phase + corrente di guasto omopolare al neutro."""
+    if not is_earthing(raw):
+        return []
+    nf = _nf(schema)
+    lg = schema.get("lang") or {}
+    uom = (lg.get("uom") or {}).get("ohm_phase", "ohm/phase")
+    def _fixed2(v):
+        s = f"{_f(v):.2f}"
+        return s.replace(".", ",") if nf.get("decimal") == "," else s
+    rows = []
+    for key in ("Zo", "Ro", "Xo"):
+        v = raw.get(key)
+        if not is_blank(v):
+            rows.append({"it": None, "en": _label(schema, key, key), "section": "electrical",
+                         "unit": uom, "value": _fixed2(v),
+                         "blank": False, "translated_ok": True})
+    # corrente di guasto omopolare: "300A 3s – 50A cont."
+    i_fault = raw.get("Corrente guasto omopolare")
+    dur = raw.get("Durata guasto omopolare")
+    i_cont = raw.get("Corrente guasto permanente")
+    if not is_blank(i_fault):
+        cont_lbl = (lg.get("ui") or {}).get("cont", "cont.")
+        parts = [f"{format_value(i_fault, {'decimals':0}, nf)}A"]
+        if not is_blank(dur):
+            d = _f(dur)
+            parts.append(f"{format_value(d/60, {'decimals':0}, nf)}min" if d and d > 60
+                         else f"{format_value(dur, {'decimals':0}, nf)}s")
+        val = " ".join(parts)
+        if not is_blank(i_cont):
+            val += f" – {format_value(i_cont, {'decimals':0}, nf)}A {cont_lbl}"
+        rows.append({"it": None,
+                     "en": _label(schema, "Neutral zero-sequence fault current",
+                                  "Neutral zero-sequence fault current"),
+                     "section": "electrical", "unit": None, "value": val,
+                     "blank": False, "translated_ok": True})
+    return rows
+
+
+def ip_note(raw, family, accessories, schema):
+    """Nota grado IP per resina con box di protezione (estrae IPxx dagli accessori)."""
+    if family != "resina":
+        return None
+    import re
+    for a in (accessories or []):
+        m = re.search(r"\bIP\s?(\d{2})\b", str(a))
+        if m:
+            tpl = ((schema.get("lang") or {}).get("ui") or {}).get(
+                "ip_note", "Protection degree {ip} provided by the protection box.")
+            return tpl.format(ip=f"IP{m.group(1)}")
+    return None
 
 
 def efficiency_row(raw, schema):
@@ -553,6 +611,8 @@ def build_tests(raw, family, earthing_override=None, schema=None):
         t.append(T["tightness"])
     t.append(T["ct_check"])
     t.append(T["core_frame"])
+    if not oil:                       # resina: misura scariche parziali
+        t.append(T["pd_measurement"])
     if earth:
         t.append(T["zero_sequence"])
     if hv:
@@ -639,6 +699,8 @@ def parse(xlsx_path, schema=None, overrides=None, lang_code="en"):
     wtr = winding_temp_row(raw, schema, windings)
     if eff:
         fields.append(eff)
+    for er in earthing_rows(raw, schema):   # Zo/Ro/Xo + fault current (solo earthing)
+        fields.append(er)
     if wtr:
         # inserisci wtr subito dopo "Sovratemperatura olio" (posizione layout)
         insert_at = len(fields)
@@ -657,8 +719,9 @@ def parse(xlsx_path, schema=None, overrides=None, lang_code="en"):
         "fields": fields,
         "sections": grouped_sections(fields, schema),
         "ratings": build_ratings(raw, schema),
-        "standards": standards_text(raw),
+        "standards": standards_text(raw, family),
         "short_circuit": sci["value"] if sci else None,
+        "ip_note": ip_note(raw, family, accessories, schema),
         "cesi": cesi_text(raw, family, schema),
         "tests": build_tests(raw, family, ov.get("__earthing__"), schema),
         "accessories_excel": accessories,

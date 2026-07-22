@@ -27,9 +27,10 @@ def _auth_token():
     return hashlib.sha256(("trafo::" + pw).encode()).hexdigest()[:32]
 
 
-@st.cache_resource
 def _cookies():
-    return CookieController()
+    if "__cookie_ctrl" not in st.session_state:
+        st.session_state["__cookie_ctrl"] = CookieController()
+    return st.session_state["__cookie_ctrl"]
 
 OMIT = "__OMIT__"
 ASSETS = Path(__file__).with_name("assets")
