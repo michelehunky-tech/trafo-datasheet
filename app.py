@@ -6,15 +6,30 @@ No database, no storage, no email. No LLM at runtime.
 """
 import os
 import base64
+import hashlib
 import tempfile
 from datetime import date
 from pathlib import Path
 
 import streamlit as st
+from streamlit_cookies_controller import CookieController
 
 from parser.extract import load_schema, parse
 from parser.validate import validate
 from render.pdf import render_pdf_modern
+
+AUTH_COOKIE = "te_auth"
+
+
+def _auth_token():
+    """Token derivato dalla password (non la password in chiaro)."""
+    pw = os.environ.get("APP_PASSWORD", "")
+    return hashlib.sha256(("trafo::" + pw).encode()).hexdigest()[:32]
+
+
+@st.cache_resource
+def _cookies():
+    return CookieController()
 
 OMIT = "__OMIT__"
 ASSETS = Path(__file__).with_name("assets")
@@ -101,6 +116,10 @@ def header():
                      use_container_width=True):
             reset_all()
             st.session_state["auth"] = False
+            try:
+                _cookies().remove(AUTH_COOKIE)
+            except Exception:
+                pass
             st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('<hr style="margin:2px 0 18px;border:none;border-top:1px solid var(--line);">',
@@ -112,6 +131,13 @@ def gate():
     inject_style()
     if st.session_state.get("auth"):
         return True
+    # ripristina la sessione dal cookie (sopravvive al refresh)
+    try:
+        if _cookies().get(AUTH_COOKIE) == _auth_token():
+            st.session_state["auth"] = True
+            return True
+    except Exception:
+        pass
     st.markdown(
         f'<div class="te-gate"><div class="te-card">'
         f'{logo_img_tag("logo")}'
@@ -128,6 +154,10 @@ def gate():
         if st.button("Enter", use_container_width=True):
             if pw and pw == os.environ.get("APP_PASSWORD", ""):
                 st.session_state["auth"] = True
+                try:
+                    _cookies().set(AUTH_COOKIE, _auth_token(), max_age=7 * 24 * 3600)
+                except Exception:
+                    pass
                 st.rerun()
             else:
                 st.error("Wrong password.")
