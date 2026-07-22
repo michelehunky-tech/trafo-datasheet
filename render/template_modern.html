@@ -56,6 +56,7 @@
   </td>
 </tr></table>
 
+{% if meta.client or meta.project or meta.date or meta.pos %}
 <table class="metastrip">
   <tr>
     <td style="width:40%"><span class="lbl">{{ ui.client }}</span><span class="val">{{ meta.client or '—' }}</span></td>
@@ -66,6 +67,7 @@
     <td colspan="3" class="projrow"><span class="lbl">{{ ui.project }}</span><span class="val">{{ meta.project or '—' }}</span></td>
   </tr>
 </table>
+{% endif %}
 
 {% if figure_svg %}
 <div class="herofig">

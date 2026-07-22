@@ -489,7 +489,7 @@ def earthing_rows(raw, schema):
     rows = []
     for key in ("Zo", "Ro", "Xo"):
         v = raw.get(key)
-        if not is_blank(v):
+        if not is_blank(v) and _f(v) is not None:   # ignora valori non numerici (es. '/')
             rows.append({"it": None, "en": _label(schema, key, key), "section": "electrical",
                          "unit": uom, "value": _fixed2(v),
                          "blank": False, "translated_ok": True})

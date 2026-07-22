@@ -1,6 +1,6 @@
 number_format:
-  decimal: .
-  thousands: ','
+  decimal: ','
+  thousands: .
 ui:
   doc_title: Technical Datasheet
   parameter: Parameter

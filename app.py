@@ -198,15 +198,20 @@ def main():
 
     # portal meta inputs
     st.subheader("Dati commessa")
-    c1, c2, c3 = st.columns(3)
-    meta = {
-        "client": c1.text_input("Client", st.session_state.get("meta", {}).get("client", "")),
-        "project": c2.text_input("Project", st.session_state.get("meta", {}).get("project", "")),
-        "date": c3.text_input("Date", st.session_state.get("meta", {}).get("date", date.today().strftime("%d %B %Y"))),
-        "offer": c1.text_input("Offer #", ""),
-        "revision": c2.text_input("Revision #", ""),
-        "pos": c3.text_input("Pos.", ""),
-    }
+    omit_meta = st.checkbox("Ometti intestazione (cliente, progetto, offerta, posizione, ecc.)",
+                            key="omit_meta")
+    if omit_meta:
+        meta = {"client": "", "project": "", "date": "", "offer": "", "revision": "", "pos": ""}
+    else:
+        c1, c2, c3 = st.columns(3)
+        meta = {
+            "client": c1.text_input("Client", st.session_state.get("meta", {}).get("client", "")),
+            "project": c2.text_input("Project", st.session_state.get("meta", {}).get("project", "")),
+            "date": c3.text_input("Date", st.session_state.get("meta", {}).get("date", date.today().strftime("%d %B %Y"))),
+            "offer": c1.text_input("Offer #", ""),
+            "revision": c2.text_input("Revision #", ""),
+            "pos": c3.text_input("Pos.", ""),
+        }
 
     LANGS = {"English": "en", "Italiano": "it", "Français": "fr", "Deutsch": "de", "Español": "es"}
     lang_label = st.radio("Lingua scheda tecnica", list(LANGS.keys()),
@@ -227,7 +232,7 @@ def main():
     resolved = {k for k, v in answers.items() if v not in (None, "", OMIT)}
     items = [it for it in validate(parsed, schema, portal_inputs)
              if it["key"] not in omitted and it["key"] not in resolved and it["kind"] != "portal"]
-    portal_missing = [p for p in ("Client", "Project") if not portal_inputs[p].strip()]
+    portal_missing = [] if omit_meta else [p for p in ("Client", "Project") if not portal_inputs[p].strip()]
 
     st.divider()
     st.write(f"**Famiglia rilevata:** {parsed['family']}  ·  **Immagine:** {parsed['image_key'] or '—'}")
